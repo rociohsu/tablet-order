@@ -132,10 +132,18 @@ function renderZones() {
     <nav class="zone-tabs" aria-label="用餐區域">${zoneNames.map((zone, index) => `<button class="zone-tab ${index === 0 ? "active" : ""}" data-zone="${zone}">${zone}</button>`).join("")}</nav>
     <section class="table-card"><div class="zone-title"><h2 id="zone-title">${selectedZone}桌位</h2><span>請選擇一個桌位</span></div><div class="tables" id="tables"></div><div class="zone-footer"><button class="cancel-table" id="cancel-table">返回待機</button><button class="confirm-table" id="confirm-table">確認配桌</button></div></section>`;
 
+  const updateSelection = () => {
+    document.querySelectorAll(".table-button").forEach((button) => {
+      button.classList.toggle("selected", button.dataset.table === selectedTable);
+    });
+  };
   const drawTables = () => {
     document.querySelector("#zone-title").textContent = `${selectedZone}桌位`;
-    document.querySelector("#tables").innerHTML = zones[selectedZone].map((table) => `<button class="table-button ${table === selectedTable ? "selected" : ""}" data-table="${table}">${table}</button>`).join("");
-    document.querySelectorAll(".table-button").forEach((button) => button.addEventListener("click", () => { selectedTable = button.dataset.table; drawTables(); }));
+    document.querySelector("#tables").innerHTML = zones[selectedZone].map((table) => `<button class="table-button" data-table="${table}">${table}</button>`).join("");
+    document.querySelectorAll(".table-button").forEach((button) => button.addEventListener("click", () => {
+      selectedTable = button.dataset.table;
+      updateSelection();
+    }));
   };
   drawTables();
   document.querySelectorAll(".zone-tab").forEach((button) => button.addEventListener("click", () => {
