@@ -17,6 +17,25 @@ const zones = {
 let carouselTimer;
 let currentSlide = 0;
 
+function setServiceBell(visible) {
+  document.querySelector("#service-bell").classList.toggle("visible", visible);
+}
+
+function setHeaderMode(management = false) {
+  document.querySelector(".brand-bar").classList.toggle("management-mode", management);
+}
+
+function carouselMarkup() {
+  return `
+    <section class="carousel" id="carousel" aria-label="待機輪播圖">
+      ${banners.map((banner, index) => `
+        <article class="slide ${index === 0 ? "active" : ""}" style="background-image:url('${banner.image}')"></article>`).join("")}
+      <div class="dots" aria-label="輪播頁數">
+        ${banners.map((_, index) => `<button class="dot ${index === 0 ? "active" : ""}" data-slide="${index}" aria-label="第 ${index + 1} 張"></button>`).join("")}
+      </div>
+    </section>`;
+}
+
 function showToast(message) {
   toast.textContent = message;
   toast.classList.add("show");
@@ -29,6 +48,8 @@ function codeField(label = "請輸入通行碼") {
 }
 
 function renderLogin() {
+  setHeaderMode(false);
+  setServiceBell(false);
   view.className = "view login-view";
   view.innerHTML = `
     <form class="login-card" id="login-form">
@@ -53,22 +74,18 @@ function renderLogin() {
 }
 
 function renderStandby() {
+  setHeaderMode(false);
+  setServiceBell(false);
   view.className = "view standby-view";
   view.innerHTML = `
-    <section class="carousel" id="carousel" aria-label="待機輪播圖">
-      ${banners.map((banner, index) => `
-        <article class="slide ${index === 0 ? "active" : ""}" style="background-image:url('${banner.image}')"></article>`).join("")}
-      <div class="dots" aria-label="輪播頁數">
-        ${banners.map((_, index) => `<button class="dot ${index === 0 ? "active" : ""}" data-slide="${index}" aria-label="第 ${index + 1} 張"></button>`).join("")}
-      </div>
-    </section>
+    ${carouselMarkup()}
     <footer class="standby-footer">
       <div class="table-status"><strong>尚未配桌</strong>請先完成配桌，開始使用點餐服務</div>
       <button class="service-button" id="assign-table">配桌 <img class="button-icon" src="assets/icons/arrow-right.svg" alt="" aria-hidden="true" /></button>
     </footer>`;
 
   document.querySelectorAll(".dot").forEach((dot) => dot.addEventListener("click", () => goToSlide(Number(dot.dataset.slide))));
-  document.querySelector("#assign-table").addEventListener("click", renderVerification);
+  document.querySelector("#assign-table").addEventListener("click", () => renderVerification());
   setupSwipe();
   startCarousel();
 }
@@ -94,7 +111,7 @@ function setupSwipe() {
   });
 }
 
-function renderVerification() {
+function renderVerification(onVerified = renderZones) {
   window.clearInterval(carouselTimer);
   const overlay = document.createElement("div");
   overlay.className = "overlay";
@@ -118,11 +135,13 @@ function renderVerification() {
       return;
     }
     overlay.remove();
-    renderZones();
+    onVerified();
   });
 }
 
 function renderZones() {
+  setHeaderMode(false);
+  setServiceBell(false);
   const zoneNames = Object.keys(zones);
   let selectedZone = zoneNames[0];
   let selectedTable = "";
@@ -155,8 +174,82 @@ function renderZones() {
   document.querySelector("#cancel-table").addEventListener("click", renderStandby);
   document.querySelector("#confirm-table").addEventListener("click", () => {
     if (!selectedTable) { showToast("請先選擇桌位"); return; }
-    showToast(`${selectedTable} 配桌成功`);
+    renderAssigned(selectedTable);
   });
+}
+
+function renderAssigned(table, opened = false) {
+  setHeaderMode(false);
+  setServiceBell(true);
+  view.className = "view standby-view";
+  view.innerHTML = `
+    ${carouselMarkup()}
+    <footer class="assigned-footer">
+      <button class="table-action" id="reassign-table" type="button"><strong>${table.replace("桌", "")}</strong><span>|</span>重新配桌</button>
+      <button class="start-order" id="start-order" type="button">${opened ? "開始點餐" : "開桌"} <img class="button-icon" src="assets/icons/arrow-right.svg" alt="" aria-hidden="true" /></button>
+    </footer>`;
+  document.querySelectorAll(".dot").forEach((dot) => dot.addEventListener("click", () => goToSlide(Number(dot.dataset.slide))));
+  document.querySelector("#reassign-table").addEventListener("click", () => renderVerification(() => renderManagement(table)));
+  document.querySelector("#start-order").addEventListener("click", () => renderOpenTableStep(table, 1));
+  document.querySelector("#service-bell").onclick = () => showToast("已送出服務鈴");
+  setupSwipe();
+  startCarousel();
+}
+
+function renderManagement(table) {
+  setHeaderMode(true);
+  setServiceBell(false);
+  view.className = "view management-view";
+  view.innerHTML = `
+    <section class="table-context" aria-label="目前桌位資訊">
+      <div><span>品牌</span><strong>ＯＯＯ</strong></div>
+      <div><span>門市</span><strong>ＯＯＯＯ</strong></div>
+      <div><span>區域</span><strong>A區</strong></div>
+      <div><span>桌位</span><strong>${table}</strong></div>
+    </section>
+    <section class="management-actions">
+      <button class="management-action" id="management-reassign" type="button"><img src="assets/icons/reassign-table.svg" alt="" aria-hidden="true" /><span>重新配桌</span></button>
+      <button class="management-action" id="management-open" type="button"><img src="assets/icons/open-table.svg" alt="" aria-hidden="true" /><span>開桌</span></button>
+    </section>`;
+  document.querySelector("#management-reassign").addEventListener("click", renderZones);
+  document.querySelector("#management-open").addEventListener("click", () => renderOpenTableStep(table, 1));
+}
+
+function renderOpenTableStep(table, step, data = {}) {
+  setServiceBell(false);
+  setHeaderMode(false);
+  view.className = "view open-table-view";
+  const plan = data.plan || "599方案";
+  const people = data.people || { adult: 1, senior: 0, child: 1, height: 0 };
+  const price = { adult: 599, senior: 539, child: 479, height: 0 };
+  const totalPeople = Object.values(people).reduce((sum, value) => sum + value, 0);
+  const stepContent = step === 1 ? `
+    <h1>開桌</h1><p class="context">A區 ${table}</p>
+    <label class="field-label">用餐時間 <input id="meal-time" type="number" min="0" value="${data.mealTime || 120}" /> 分鐘</label>
+    <div class="form-actions"><button class="back-button" id="cancel-open" type="button">取消</button><button class="next-button" id="next-open" type="button">下一步</button></div>` : step === 2 ? `
+    <h1>選擇方案</h1><p class="context">A區 ${table}</p>
+    <div class="plan-grid">${[499, 599, 699, 799, 899, 999].map((value) => `<button class="plan-button ${plan === `${value}方案` ? "selected" : ""}" data-plan="${value}方案" type="button">${value}方案</button>`).join("")}</div>
+    <div class="form-actions"><button class="back-button" id="back-open" type="button">上一步</button><button class="next-button" id="next-open" type="button">下一步</button></div>` : `
+    <h1>價位與人數</h1>
+    <div class="price-plan">${plan}</div>
+    <div class="price-list">${[["adult", "成人", price.adult], ["senior", "銀髮", price.senior], ["child", "兒童", price.child], ["height", "120以下", price.height]].map(([key, label, amount]) => `<div class="price-row"><span>${label} $${amount}</span><button class="quantity-button" data-quantity="${key}" data-delta="-1" type="button">−</button><span class="quantity-value" data-value="${key}">${people[key]}</span><button class="quantity-button" data-quantity="${key}" data-delta="1" type="button">＋</button></div>`).join("")}</div>
+    <div class="form-actions"><button class="back-button" id="back-open" type="button">上一步</button><button class="confirm-open" id="confirm-open" type="button" ${totalPeople ? "" : "disabled"}>確定開桌</button></div>`;
+  view.innerHTML = `<section class="open-table-card">${stepContent}</section>`;
+  document.querySelector("#cancel-open")?.addEventListener("click", () => renderAssigned(table));
+  document.querySelector("#back-open")?.addEventListener("click", () => renderOpenTableStep(table, step - 1, data));
+  document.querySelector("#next-open")?.addEventListener("click", () => {
+    if (step === 1) renderOpenTableStep(table, 2, { ...data, mealTime: document.querySelector("#meal-time").value });
+    if (step === 2) renderOpenTableStep(table, 3, { ...data, plan: document.querySelector(".plan-button.selected")?.dataset.plan || plan });
+  });
+  document.querySelectorAll(".plan-button").forEach((button) => button.addEventListener("click", () => {
+    document.querySelectorAll(".plan-button").forEach((item) => item.classList.toggle("selected", item === button));
+  }));
+  document.querySelectorAll(".quantity-button").forEach((button) => button.addEventListener("click", () => {
+    const key = button.dataset.quantity;
+    people[key] = Math.max(0, people[key] + Number(button.dataset.delta));
+    document.querySelector(`[data-value="${key}"]`).textContent = people[key];
+  }));
+  document.querySelector("#confirm-open")?.addEventListener("click", () => renderAssigned(table, true));
 }
 
 renderLogin();
