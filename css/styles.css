@@ -169,6 +169,21 @@ button:focus-visible { outline: 3px solid rgba(222, 5, 46, .28); outline-offset:
 .verify-actions { display: flex; gap: 12px; margin-top: 16px; }
 .verify-actions .primary-button { flex: 1; }
 .verify-actions .secondary-button { width: 35%; border: 1px solid var(--line); border-radius: 10px; }
+.service-menu-overlay { position: absolute; inset: var(--bar-height) 0 0; z-index: 5; display: grid; place-items: center; padding: 24px; background: rgba(62, 62, 62, .28); }
+.service-menu-card { position: relative; width: min(560px, 90%); padding: 28px 32px 30px; border-radius: 14px; background: #fff; box-shadow: var(--shadow); }
+.service-menu-card h2 { margin: 0 0 24px; color: var(--ink); font-size: 30px; }
+.service-menu-close { position: absolute; top: 20px; right: 22px; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: transparent; background: #f2f2f2; font-size: 0; }
+.service-menu-close::before, .service-menu-close::after { position: absolute; width: 18px; height: 2px; border-radius: 2px; background: var(--muted); content: ""; }
+.service-menu-close::before { transform: rotate(45deg); }
+.service-menu-close::after { transform: rotate(-45deg); }
+.service-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.service-option { min-height: 92px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: #fff; font-size: 23px; font-weight: 600; }
+.service-option:hover, .service-option.selected { border-color: var(--brand); color: var(--brand); background: #fff; }
+.service-option.selected { border-width: 2px; }
+.service-confirm { display: block; width: 180px; min-height: 52px; margin: 28px auto 0; border-radius: 9px; color: #fff; background: #888; font-size: 20px; font-weight: 700; }
+.service-confirm:not(:disabled) { background: var(--brand); box-shadow: 0 8px 18px rgba(222, 5, 46, .2); }
+.service-confirm:not(:disabled):hover { background: var(--brand-dark); }
+.service-confirm:disabled { cursor: default; }
 
 .zones-view { display: flex; flex-direction: column; padding: 32px 36px max(34px, env(safe-area-inset-bottom, 0px)); }
 .page-heading { display: flex; align-items: end; justify-content: space-between; margin-bottom: 22px; }
@@ -237,6 +252,11 @@ button:focus-visible { outline: 3px solid rgba(222, 5, 46, .28); outline-offset:
   .brand-bar > img { width: 154px; height: 44px; }
   .service-bell { gap: 6px; min-height: 44px; padding: 0 12px; font-size: 16px; }
   .service-bell img { width: 24px; height: 24px; }
+  .service-menu-card { padding: 24px 20px 24px; }
+  .service-menu-card h2 { font-size: 26px; }
+  .service-menu-close { top: 16px; right: 18px; }
+  .service-option { min-height: 72px; font-size: 18px; }
+  .service-confirm { width: 150px; }
   .view { height: calc(100% - var(--bar-height)); margin-top: var(--bar-height); }
   .login-card { padding: 26px 22px 24px; }
   .standby-footer { gap: 10px; padding-inline: 16px; }

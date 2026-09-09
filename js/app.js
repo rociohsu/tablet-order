@@ -43,6 +43,36 @@ function showToast(message) {
   showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2400);
 }
 
+function renderServiceMenu() {
+  window.clearInterval(carouselTimer);
+  const overlay = document.createElement("div");
+  overlay.className = "service-menu-overlay";
+  overlay.innerHTML = `
+    <section class="service-menu-card" role="dialog" aria-modal="true" aria-labelledby="service-menu-title">
+      <button class="service-menu-close" id="close-service-menu" type="button" aria-label="關閉服務鈴選單">×</button>
+      <h2 id="service-menu-title">服務鈴</h2>
+      <div class="service-options">
+        ${["清理桌面", "詢問菜單", "出餐延遲"].map((option) => `<button class="service-option" data-option="${option}" type="button">${option}</button>`).join("")}
+      </div>
+      <button class="service-confirm" id="confirm-service" type="button" disabled>確定</button>
+    </section>`;
+  document.querySelector("#app").appendChild(overlay);
+
+  let selectedOption = "";
+  const closeMenu = () => { overlay.remove(); startCarousel(); };
+  overlay.querySelector("#close-service-menu").addEventListener("click", closeMenu);
+  overlay.addEventListener("click", (event) => { if (event.target === overlay) closeMenu(); });
+  overlay.querySelectorAll(".service-option").forEach((button) => button.addEventListener("click", () => {
+    selectedOption = button.dataset.option;
+    overlay.querySelectorAll(".service-option").forEach((item) => item.classList.toggle("selected", item === button));
+    overlay.querySelector("#confirm-service").disabled = false;
+  }));
+  overlay.querySelector("#confirm-service").addEventListener("click", () => {
+    showToast(`已送出：${selectedOption}`);
+    closeMenu();
+  });
+}
+
 function codeField(label = "請輸入通行碼") {
   return `<input class="code-input" id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" aria-label="${label}" placeholder="••••••" />`;
 }
@@ -54,9 +84,9 @@ function renderLogin() {
   view.innerHTML = `
     <form class="login-card" id="login-form">
       <h1>桌邊自助點餐系統</h1>
-      <p>請輸入店內通行碼，開始今日服務</p>
+      <p>請輸入通行碼，開始今日服務</p>
       ${codeField()}
-      <p class="hint" id="login-hint">6 碼半形數字店代碼</p>
+      <p class="hint" id="login-hint">6 碼半形數字通行碼</p>
       <button class="primary-button" type="submit">確定登入</button>
     </form>`;
 
@@ -65,7 +95,7 @@ function renderLogin() {
   document.querySelector("#login-form").addEventListener("submit", (event) => {
     event.preventDefault();
     if (!/^\d{6}$/.test(input.value)) {
-      document.querySelector("#login-hint").textContent = "請輸入 6 碼半形數字店代碼";
+      document.querySelector("#login-hint").textContent = "請輸入 6 碼半形數字通行碼";
       input.focus();
       return;
     }
@@ -118,7 +148,7 @@ function renderVerification(onVerified = renderZones) {
   overlay.innerHTML = `
     <form class="verify-card" id="verify-form">
       <h2>通行碼驗證</h2>
-      <p>配桌前請輸入 6 碼店代碼</p>
+      <p>請輸入通行碼</p>
       ${codeField("配桌通行碼")}
       <p class="hint" id="verify-hint">驗證通過後即可選擇用餐區域與桌位</p>
       <div class="verify-actions"><button class="secondary-button" type="button" id="cancel-verify">取消</button><button class="primary-button" type="submit">驗證</button></div>
@@ -191,7 +221,7 @@ function renderAssigned(table, opened = false) {
   document.querySelectorAll(".dot").forEach((dot) => dot.addEventListener("click", () => goToSlide(Number(dot.dataset.slide))));
   document.querySelector("#reassign-table").addEventListener("click", () => renderVerification(() => renderManagement(table)));
   document.querySelector("#start-order").addEventListener("click", () => renderOpenTableStep(table, 1));
-  document.querySelector("#service-bell").onclick = () => showToast("已送出服務鈴");
+  document.querySelector("#service-bell").onclick = renderServiceMenu;
   setupSwipe();
   startCarousel();
 }
@@ -202,8 +232,8 @@ function renderManagement(table) {
   view.className = "view management-view";
   view.innerHTML = `
     <section class="table-context" aria-label="目前桌位資訊">
-      <div><span>品牌</span><strong>ＯＯＯ</strong></div>
-      <div><span>門市</span><strong>ＯＯＯＯ</strong></div>
+      <div><span>品牌</span><strong>石二鍋</strong></div>
+      <div><span>門市</span><strong>復興門市</strong></div>
       <div><span>區域</span><strong>A區</strong></div>
       <div><span>桌位</span><strong>${table}</strong></div>
     </section>
