@@ -206,9 +206,9 @@ button:focus-visible { outline: 3px solid rgba(222, 5, 46, .28); outline-offset:
 
 .assigned-footer { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 24px max(22px, env(safe-area-inset-bottom, 0px)); }
 .assigned-footer button { min-height: 78px; border-radius: 16px; font-size: 30px; font-weight: 700; }
-.assigned-footer .table-action { border: 1px solid var(--ink); color: var(--ink); background: #fff; }
+.assigned-footer .table-action { display: flex; align-items: center; justify-content: center; border: 1px solid var(--ink); color: var(--ink); background: #fff; }
 .assigned-footer .table-action strong { font-size: 36px; }
-.assigned-footer .table-action span { display: inline-block; margin: 0 14px; font-weight: 400; }
+.assigned-footer .table-action span { display: block; flex: 0 0 1px; width: 1px; height: 26px; margin: 0 14px; background: var(--ink); font-size: 0; }
 .assigned-footer .start-order { color: #fff; background: var(--brand); }
 .assigned-footer .start-order:disabled { cursor: default; color: #fff; background: #c8c9c9; box-shadow: none; }
 
@@ -264,7 +264,7 @@ button:focus-visible { outline: 3px solid rgba(222, 5, 46, .28); outline-offset:
   .assigned-footer { gap: 8px; padding-inline: 16px; }
   .assigned-footer button { min-height: 60px; border-radius: 12px; font-size: 20px; }
   .assigned-footer .table-action strong { font-size: 26px; }
-  .assigned-footer .table-action span { margin: 0 7px; }
+  .assigned-footer .table-action span { height: 21px; margin: 0 7px; }
   .management-mode .header-title { font-size: 24px; }
   .management-mode .header-version { font-size: 15px; }
   .table-context { min-height: 104px; }
