@@ -282,7 +282,17 @@ function renderOpenTableStep(table, step, data = {}) {
     people[key] = Math.max(0, people[key] + Number(button.dataset.delta));
     document.querySelector(`[data-value="${key}"]`).textContent = people[key];
   }));
-  document.querySelector("#confirm-open")?.addEventListener("click", () => renderAssigned(table, true));
+  document.querySelector("#confirm-open")?.addEventListener("click", () => {
+    if (!Object.values(people).some(count => count > 0)) return;
+    const openedAt = new Date();
+    const duration = Number(data.mealTime ?? 120);
+    const context = { table, plan, people: { ...people }, openedAt: openedAt.toISOString(), endsAt: new Date(openedAt.getTime() + (Number.isFinite(duration) && duration >= 0 ? duration : 120) * 60000).toISOString(), lastOrderAt: null, nextSubmissionAt: null };
+    try {
+      sessionStorage.setItem("tablet-order-session", JSON.stringify(context));
+      sessionStorage.removeItem("tablet-order-cart-v1");
+    } catch { showToast("瀏覽器無法儲存開桌資訊"); }
+    renderAssigned(table, true);
+  });
 }
 
 renderLogin();

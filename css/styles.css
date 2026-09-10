@@ -294,3 +294,10 @@ button:focus-visible { outline: 3px solid rgba(222, 5, 46, .28); outline-offset:
   .zones-view { padding-inline: 18px; }
   .tables { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* Shared brand focus treatment for all form fields. */
+input:focus, textarea:focus, select:focus, [contenteditable="true"]:focus {
+  border-color: var(--brand);
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
