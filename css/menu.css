@@ -244,7 +244,3 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
 /* Consistent horizontal spacing in the dining status bar at every width. */
 .order-status-bar .table-summary>div{padding-left:10px;padding-right:10px}
 .order-status-bar .time-summary{padding-left:10px;padding-right:10px;justify-content:start;column-gap:10px}
-
-/* Popup close controls keep their neutral appearance when focused. */
-#close-service:focus, #close-service:focus-visible,
-#close-language:focus, #close-language:focus-visible{outline:none;box-shadow:none;border:0}

@@ -301,3 +301,11 @@ input:focus, textarea:focus, select:focus, [contenteditable="true"]:focus {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
 }
+
+/* Shared focus appearance for popup close buttons on both tablet pages. */
+button.close-button:focus, button.close-button:focus-visible,
+button.service-menu-close:focus, button.service-menu-close:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border: 0;
+}
