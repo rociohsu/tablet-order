@@ -46,6 +46,7 @@ legend small{display:block;font-size:16px;font-weight:400;color:var(--muted);mar
 .nested fieldset:last-child{margin-bottom:0}
 .extra-qty{display:flex;justify-content:flex-end;align-items:center;gap:16px;margin-bottom:12px}
 .extra-qty button,.stepper button{width:44px;height:44px;background:#f2f2f2;border-radius:8px;font-size:24px}
+.extra-qty button:disabled,.stepper button:disabled{color:var(--muted);opacity:.45;cursor:default}
 .note-label{display:block;font-size:22px;font-weight:700;margin-bottom:12px}
 .note-label span{font-size:16px;font-weight:400;color:#666}
 textarea{width:100%;min-height:100px;padding:14px;border:1px solid #ccc;border-radius:10px;font:inherit;resize:vertical}
