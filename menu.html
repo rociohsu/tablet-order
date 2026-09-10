@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>桌邊點餐｜王品集團</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/menu.css">
+</head>
+<body><main class="screen menu-screen">
+<header class="brand-bar"><img src="assets/logo.png" alt="王品集團 wowprime"><button class="service-bell visible" id="service-bell" aria-haspopup="dialog"><img src="assets/icons/Icon_service-bell.svg" alt="">服務鈴</button></header>
+<div class="menu-body">
+<nav id="categories" aria-label="餐點分類"></nav><div class="menu-scroll" id="menu-list"></div></div>
+</main>
+<dialog id="detail" aria-labelledby="detail-title"><div class="detail-layout"><div class="detail-summary"><img class="dish-photo" src="assets/menu.jpg" alt=""><div class="dish-copy"><p class="eyebrow" id="detail-category"></p><h2 id="detail-title"></h2><p id="detail-description"></p><strong id="detail-price"></strong><p class="photo-note">圖片僅供參考，餐點依現場供應為準</p></div></div><div class="detail-options"><button class="close-button" id="close-detail" aria-label="關閉商品詳情">×</button><div class="options-scroll"><h2>客製您的餐點</h2><div id="option-groups"></div><label class="note-label" for="meal-note">餐點備註 <span>選填</span></label><textarea id="meal-note" maxlength="200" placeholder="如有其他需求，請於此填寫"></textarea></div></div></div><footer class="detail-footer"><div class="stepper"><button id="minus" aria-label="減少餐點數量">−</button><output id="quantity">1</output><button id="plus" aria-label="增加餐點數量">＋</button></div><p id="validation" aria-live="polite"></p><button id="add-cart" class="add-cart"></button></footer></dialog>
+<dialog id="service-dialog" aria-labelledby="service-title"><button class="close-button" id="close-service" aria-label="關閉服務鈴選單">×</button><h2 id="service-title">服務鈴</h2><div class="service-options"></div><button class="service-confirm" id="confirm-service" disabled>確定</button></dialog>
+<div id="menu-toast" role="status" aria-live="polite"></div><script src="js/menu.js"></script>
+</body></html>

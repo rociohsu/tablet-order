@@ -220,7 +220,10 @@ function renderAssigned(table, opened = false) {
     </footer>`;
   document.querySelectorAll(".dot").forEach((dot) => dot.addEventListener("click", () => goToSlide(Number(dot.dataset.slide))));
   document.querySelector("#reassign-table").addEventListener("click", () => renderVerification(() => renderManagement(table)));
-  document.querySelector("#start-order").addEventListener("click", () => renderOpenTableStep(table, 1));
+  document.querySelector("#start-order").addEventListener("click", () => {
+    if (opened) window.location.href = "menu.html";
+    else renderOpenTableStep(table, 1);
+  });
   document.querySelector("#service-bell").onclick = renderServiceMenu;
   setupSwipe();
   startCarousel();
