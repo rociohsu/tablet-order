@@ -161,18 +161,18 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
 .menu-scroll{min-height:0}
 .order-status-bar{display:flex;align-items:stretch;gap:10px;flex-shrink:0;padding:10px max(12px,env(safe-area-inset-right,0px)) max(10px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px));background:#e6e6e6;border-top:1px solid var(--line)}
 .order-status-bar dl{margin:0;display:flex;align-items:center;gap:14px}
-.order-status-bar dt{font-size:13px;color:var(--muted);white-space:nowrap}
+.order-status-bar dt{font-size:14px;color:var(--muted);white-space:nowrap}
 .order-status-bar dd{margin:2px 0 0;font-size:16px;white-space:nowrap;font-weight:500}
 .table-summary>div{background:white;padding:7px 12px;border-radius:6px;min-width:68px}
 .order-status-bar .table-summary{gap:8px}
 .time-summary{flex:1;flex-wrap:wrap;background:#fff;padding:7px 12px;border-radius:6px}
-.view-cart{display:flex;align-items:center;justify-content:center;gap:8px;min-width:192px;padding:12px 16px;background:var(--brand);color:white;border-radius:9px;font-size:20px;font-weight:700}
+.view-cart{display:flex;align-items:center;justify-content:center;gap:8px;min-width:300px;padding:12px 16px;background:var(--brand);color:white;border-radius:9px;font-size:20px;font-weight:700}
 .view-cart img{width:26px;height:26px;filter:brightness(0) invert(1)}
 .view-cart:disabled{background:#888;cursor:default}
 #cart-count{display:grid;place-items:center;min-width:26px;height:26px;border-radius:50%;background:#fff;color:var(--brand);font-size:16px}
 .view-cart:disabled #cart-count{color:#666}
-@media(max-width:1050px){.order-status-bar{flex-wrap:wrap}.order-status-bar .time-summary{order:3;flex-basis:100%;justify-content:space-between}.view-cart{margin-left:auto}.table-summary>div{padding:5px 12px}.order-status-bar dt{font-size:12px}.order-status-bar dd{font-size:15px}}
-@media(max-width:600px){#categories button{font-size:18px;min-height:54px;padding:11px 4px 9px}.order-status-bar{gap:6px;padding:8px}.order-status-bar .table-summary{gap:5px}.table-summary>div{min-width:0;padding:4px 7px}.view-cart{font-size:16px;min-width:0;padding:8px;gap:5px}.view-cart img{display:none}.order-status-bar .time-summary{gap:8px;padding:6px}}
+@media(max-width:1050px){.order-status-bar{flex-wrap:wrap}.order-status-bar .time-summary{order:3;flex-basis:100%;justify-content:space-between}.view-cart{margin-left:auto}.table-summary>div{padding:5px 12px}.order-status-bar dt{font-size:14px}.order-status-bar dd{font-size:16px}}
+@media(max-width:600px){#categories button{font-size:18px;min-height:54px;padding:11px 4px 9px}.order-status-bar{gap:6px;padding:8px}.order-status-bar .table-summary{gap:5px}.table-summary>div{min-width:0;padding:4px 7px}.view-cart{font-size:16px;min-width:300px;padding:8px;gap:5px}.view-cart img{display:none}.order-status-bar .time-summary{gap:8px;padding:6px}}
 
 .detail-feedback{flex:1;min-width:0}
 #detail-limit{margin:4px 0 0;color:var(--brand);font-size:18px;line-height:1.4}
@@ -198,15 +198,15 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
 .order-status-bar .table-summary>div{background:#F6F6F6;border-radius:8px;padding:8px 14px;min-width:84px}
 .order-status-bar .time-summary{grid-column:1/-1;grid-row:2;display:flex;justify-content:space-between;gap:16px;background:#F6F6F6;border-radius:8px;padding:9px 14px}
 .order-status-bar dt{font-size:14px}
-.order-status-bar dd{font-size:20px;margin-top:3px}
-.order-status-bar .view-cart{grid-column:2;grid-row:1;min-width:240px;margin:0;font-size:24px;border-radius:12px;padding:12px 24px}
+.order-status-bar dd{font-size:16px;margin-top:3px}
+.order-status-bar .view-cart{grid-column:2;grid-row:1;min-width:300px;margin:0;font-size:24px;border-radius:12px;padding:12px 24px}
 @media(max-width:600px){
 .order-status-bar{padding:8px;gap:8px}
 .order-status-bar .table-summary{gap:6px}
 .order-status-bar .table-summary>div{min-width:0;padding:7px 9px}
-.order-status-bar dt{font-size:12px}
+.order-status-bar dt{font-size:14px}
 .order-status-bar dd{font-size:16px}
-.order-status-bar .view-cart{min-width:0;font-size:18px;padding:10px}
+.order-status-bar .view-cart{min-width:300px;font-size:18px;padding:10px}
 .order-status-bar .time-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:9px}
 }
 /* Compact single-row dining bar. */
@@ -214,26 +214,26 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
 .order-status-bar .table-summary{grid-column:1;grid-row:1;gap:8px}
 .order-status-bar .table-summary>div{min-width:0;padding:8px 12px}
 .order-status-bar .time-summary{grid-column:2;grid-row:1;display:grid;grid-template-columns:repeat(4,auto);align-content:center;justify-content:space-between;gap:10px;padding:8px 12px;min-width:0}
-.order-status-bar dt{font-size:13px}
-.order-status-bar dd{font-size:18px}
-.order-status-bar .view-cart{grid-column:3;grid-row:1;min-width:220px;padding:12px 20px;font-size:22px}
+.order-status-bar dt{font-size:14px}
+.order-status-bar dd{font-size:16px}
+.order-status-bar .view-cart{grid-column:3;grid-row:1;min-width:300px;padding:12px 20px;font-size:22px}
 @media(max-width:1050px){
 .order-status-bar{gap:8px;padding:8px}
 .order-status-bar .table-summary{gap:6px}
 .order-status-bar .table-summary>div{padding:7px 8px}
 .order-status-bar .time-summary{gap:8px;padding:7px 10px}
-.order-status-bar dt{font-size:11px}
+.order-status-bar dt{font-size:14px}
 .order-status-bar dd{font-size:16px}
-.order-status-bar .view-cart{min-width:170px;padding:10px 12px;font-size:20px}
+.order-status-bar .view-cart{min-width:300px;padding:10px 12px;font-size:20px}
 }
 @media(max-width:800px){
 .order-status-bar{gap:6px}
 .order-status-bar .table-summary{gap:4px}
 .order-status-bar .table-summary>div{padding:6px}
 .order-status-bar .time-summary{gap:6px;padding:6px}
-.order-status-bar dt{font-size:10px}
-.order-status-bar dd{font-size:14px}
-.order-status-bar .view-cart{min-width:140px;padding:8px;font-size:17px;gap:6px}
+.order-status-bar dt{font-size:14px}
+.order-status-bar dd{font-size:16px}
+.order-status-bar .view-cart{min-width:300px;padding:8px;font-size:17px;gap:6px}
 }
 @media(max-width:600px){
 .order-status-bar{grid-template-columns:minmax(0,1fr) auto}
@@ -244,3 +244,7 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
 /* Consistent horizontal spacing in the dining status bar at every width. */
 .order-status-bar .table-summary>div{padding-left:10px;padding-right:10px}
 .order-status-bar .time-summary{padding-left:10px;padding-right:10px;justify-content:start;column-gap:10px}
+
+/* Popup close controls keep their neutral appearance when focused. */
+#close-service:focus, #close-service:focus-visible,
+#close-language:focus, #close-language:focus-visible{outline:none;box-shadow:none;border:0}
