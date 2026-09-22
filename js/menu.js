@@ -314,6 +314,34 @@ $('#confirm-service').onclick = () => { serviceDialog.close(); notify(`已送出
 const mobileOrderDialog = $('#mobile-order-dialog');
 $('#mobile-order-button').onclick = () => mobileOrderDialog.showModal();
 $('#close-mobile-order').onclick = () => mobileOrderDialog.close();
+const surveyDialog = $('#survey-dialog');
+$('#survey-button').onclick = () => surveyDialog.showModal();
+$('#close-survey').onclick = () => surveyDialog.close();
+const memberDialog = $('#member-dialog');
+// Front-end preview only, matching the mobile prototype's membership flag.
+let memberLoggedIn = false;
+function renderMember() {
+  $('#member-guest').hidden = memberLoggedIn;
+  $('#member-account').hidden = !memberLoggedIn;
+}
+$('#member-button').onclick = () => {
+  try { memberLoggedIn = localStorage.getItem('funMember') === '1'; } catch {}
+  renderMember();
+  memberDialog.showModal();
+};
+$('#close-member').onclick = () => memberDialog.close();
+$('#member-login').onclick = () => {
+  try { localStorage.setItem('funMember', '1'); } catch {}
+  memberLoggedIn = true;
+  renderMember();
+  $('#member-logout').focus();
+};
+$('#member-logout').onclick = () => {
+  try { localStorage.removeItem('funMember'); } catch {}
+  memberLoggedIn = false;
+  renderMember();
+  $('#member-login').focus();
+};
 const languageDialog = $('#language-dialog');
 let selectedLanguage = { code: 'zh-Hant', label: '中文' };
 let pendingLanguage = null;
@@ -344,7 +372,7 @@ try {
   const labels = { 'zh-Hant': '中文', en: 'English', ja: '日本語' };
   if (language && labels[language.code]) { selectedLanguage = {code:language.code,label:labels[language.code]}; $('#language-label').textContent = selectedLanguage.label; }
 } catch {}
-[detail, serviceDialog, languageDialog, mobileOrderDialog].forEach(dialog => dialog.addEventListener('click', event => { const rect = dialog.getBoundingClientRect(); if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close(); }));
+[detail, serviceDialog, languageDialog, mobileOrderDialog, surveyDialog, memberDialog].forEach(dialog => dialog.addEventListener('click', event => { const rect = dialog.getBoundingClientRect(); if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close(); }));
 renderCategory(0);
 
 function renderOrderStatus() {
@@ -443,16 +471,16 @@ function historyLineMarkup(line) {
 function renderOrderHistory() {
   // Fill missing preview groups without persisting demo orders or affecting limits.
   const previewBatches = [
-    { demo: true, lines: [{ name: '提拉米蘇', unit: 150, qty: 1 }] },
-    { demo: true, lines: [
+    { demo: true, time: '15:20', lines: [{ name: '提拉米蘇', unit: 150, qty: 1 }] },
+    { demo: true, time: '15:35', lines: [
       { name: '巴斯克乳酪蛋糕', unit: 160, qty: 1 },
       { name: '古早味紅茶', unit: 40, qty: 2, flavors: ['去冰', '微糖'] }
     ] }
   ];
   const displayBatches = [...orderBatches, ...previewBatches.slice(orderBatches.length)];
   const totalFor = lines => lines.reduce((sum, line) => sum + line.unit * line.qty, 0);
-  $('#order-history-list').innerHTML = displayBatches.map((batch, index) => `<section class="history-batch" aria-labelledby="history-batch-${index}"><header class="history-batch-header"><h3 id="history-batch-${index}">第${index + 1}次點餐</h3>${batch.demo ? '<span class="history-demo">示範</span>' : `<time datetime="${escapeCartText(batch.createdAt)}">${new Date(batch.createdAt).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })}</time>`}</header><div class="history-lines">${batch.lines.map(historyLineMarkup).join('')}</div>${batch.note ? `<p class="history-note">整單備註：${escapeCartText(batch.note)}</p>` : ''}<p class="history-subtotal">小計 ${money(totalFor(batch.lines))}</p></section>`).join('')
-    + `<section class="history-batch history-pos" aria-labelledby="history-pos-title"><header class="history-batch-header"><h3 id="history-pos-title">POS點餐</h3><span class="history-demo">服務員點餐・示範</span></header><div class="history-lines">${posOrderLines.map(historyLineMarkup).join('')}</div><p class="history-subtotal">小計 ${money(totalFor(posOrderLines))}</p></section>`;
+  $('#order-history-list').innerHTML = displayBatches.map((batch, index) => `<section class="history-batch" aria-labelledby="history-batch-${index}"><header class="history-batch-header"><h3 id="history-batch-${index}">第${index + 1}次點餐</h3>${batch.demo ? `<time datetime="${batch.time}">${batch.time}</time>` : `<time datetime="${escapeCartText(batch.createdAt)}">${new Date(batch.createdAt).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })}</time>`}</header><div class="history-lines">${batch.lines.map(historyLineMarkup).join('')}</div>${batch.note ? `<p class="history-note">整單備註：${escapeCartText(batch.note)}</p>` : ''}<p class="history-subtotal">小計 ${money(totalFor(batch.lines))}</p></section>`).join('')
+    + `<section class="history-batch history-pos" aria-labelledby="history-pos-title"><header class="history-batch-header"><h3 id="history-pos-title">POS點餐</h3><time datetime="15:40">15:40</time></header><div class="history-lines">${posOrderLines.map(historyLineMarkup).join('')}</div><p class="history-subtotal">小計 ${money(totalFor(posOrderLines))}</p></section>`;
   const allLines = [...displayBatches.flatMap(batch => batch.lines), ...posOrderLines];
   $('#order-history-total').textContent = `共${allLines.reduce((sum, line) => sum + line.qty, 0)}份・總計${money(totalFor(allLines))}`;
   $('#history-checkout').disabled = allLines.length === 0;

@@ -6,11 +6,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/menu.css">
 </head>
-<body><main class="screen menu-screen">
+<body class="tablet-only"><div class="tablet-required" role="status">請改用平板進行桌邊點餐</div><main class="screen menu-screen">
 <header class="brand-bar"><img src="assets/logo.png" alt="王品集團 wowprime"><nav class="header-actions" aria-label="用餐服務">
 <button class="header-action" id="mobile-order-button" aria-haspopup="dialog" aria-controls="mobile-order-dialog"><img src="assets/icons/Icon_qrcode.svg" alt="">手機點餐</button>
-<button class="header-action" data-header-action="會員"><img src="assets/icons/Icon_user.svg" alt="">會員</button>
-<button class="header-action" data-header-action="滿意度問卷"><img src="assets/icons/Icon_survey.svg" alt="">滿意度</button>
+<button class="header-action" id="member-button" aria-haspopup="dialog" aria-controls="member-dialog"><img src="assets/icons/Icon_user.svg" alt="">會員</button>
+<button class="header-action" id="survey-button" aria-haspopup="dialog" aria-controls="survey-dialog"><img src="assets/icons/Icon_survey.svg" alt="">滿意度</button>
 <button class="header-action" id="view-order-history" aria-haspopup="dialog"><img src="assets/icons/Icon_list.svg" alt="">點餐記錄</button>
 <button class="header-action service-bell visible" id="service-bell" aria-haspopup="dialog"><img src="assets/icons/Icon_service-bell.svg" alt="">服務鈴</button>
 <button class="header-action" id="language-button" aria-haspopup="dialog"><img src="assets/icons/Icon_earth.svg" alt=""><span id="language-label">中文</span></button>
@@ -22,6 +22,21 @@
 <dialog id="service-dialog" aria-labelledby="service-title"><button class="close-button" id="close-service" aria-label="關閉服務鈴選單"><img src="assets/icons/Icon_close.svg" alt=""></button><h2 id="service-title">服務鈴</h2><div class="service-options"></div><button class="service-confirm" id="confirm-service" disabled>確定</button></dialog>
 <dialog id="language-dialog" aria-labelledby="language-title"><button class="close-button" id="close-language" aria-label="關閉語言選擇"><img src="assets/icons/Icon_close.svg" alt=""></button><h2 id="language-title">語言選擇</h2><div class="service-options" aria-label="語言"><button class="service-option" data-language="zh-Hant" aria-pressed="false">中文</button><button class="service-option" data-language="en" aria-pressed="false">English</button><button class="service-option" data-language="ja" aria-pressed="false">日本語</button></div><button class="service-confirm" id="confirm-language" disabled>確定</button></dialog>
 <dialog id="mobile-order-dialog" aria-labelledby="mobile-order-title"><button class="close-button" id="close-mobile-order" aria-label="關閉手機掃碼點餐"><img src="assets/icons/Icon_close.svg" alt=""></button><h2 id="mobile-order-title">手機掃碼點餐</h2><img class="mobile-order-qrcode" src="assets/qrcode.png" alt="手機點餐 QR code"></dialog>
+<dialog id="survey-dialog" aria-labelledby="survey-title"><button class="close-button" id="close-survey" aria-label="關閉滿意度回饋"><img src="assets/icons/Icon_close.svg" alt=""></button><h2 id="survey-title">手機掃碼填寫滿意度回饋</h2><img class="mobile-order-qrcode" src="assets/qrcode.png" alt="滿意度回饋 QR code"></dialog>
+<dialog id="member-dialog" aria-labelledby="member-title">
+<button class="close-button" id="close-member" aria-label="關閉會員中心"><img src="assets/icons/Icon_close.svg" alt=""></button>
+<h2 id="member-title">會員中心</h2>
+<div id="member-guest"><button class="member-login" id="member-login"><img src="assets/icons/Icon_fun.svg" alt="">登入瘋美食會員</button></div>
+<div id="member-account" hidden>
+<h3>瘋美食會員(<span id="member-name">Anna</span>)</h3>
+<ul class="member-benefits">
+<li><img src="assets/icons/Icon_point.svg" alt=""><span>瘋點數 <strong>1,000</strong> 點</span></li>
+<li><img src="assets/icons/Icon_coupon.svg" alt=""><span>優惠券 <strong>1</strong> 張</span></li>
+<li><img src="assets/icons/Icon_gift-voucher.svg" alt=""><span>電子禮券 0 張</span></li>
+</ul>
+<button class="member-logout" id="member-logout">登出</button>
+</div>
+</dialog>
 <dialog id="cart-dialog" aria-labelledby="cart-title">
 <button class="close-button cart-close" id="close-cart" aria-label="關閉購物車"><img src="assets/icons/Icon_close.svg" alt=""></button>
 <section class="cart-panel">
