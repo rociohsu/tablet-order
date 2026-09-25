@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>結帳｜王品集團</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap"><link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/menu.css"><link rel="stylesheet" href="css/payment.css"></head>
+<body class="tablet-only payment-page"><div class="tablet-required" role="status">請改用平板進行桌邊點餐</div><main class="screen payment-screen"><header class="brand-bar"><img src="assets/logo.png" alt="王品集團 wowprime"><nav class="header-actions" aria-label="用餐服務">
+<button class="header-action" id="mobile-order-button" aria-haspopup="dialog" aria-controls="mobile-order-dialog"><img src="assets/icons/Icon_qrcode.svg" alt="">手機點餐</button>
+<button class="header-action" id="member-button" aria-haspopup="dialog" aria-controls="member-dialog"><img src="assets/icons/Icon_user.svg" alt="">會員</button>
+<button class="header-action" id="survey-button" aria-haspopup="dialog" aria-controls="survey-dialog"><img src="assets/icons/Icon_survey.svg" alt="">滿意度</button>
+<button class="header-action" id="view-order-history" aria-haspopup="dialog"><img src="assets/icons/Icon_list.svg" alt="">點餐記錄</button>
+<button class="header-action service-bell visible" id="service-bell" aria-haspopup="dialog"><img src="assets/icons/Icon_service-bell.svg" alt="">服務鈴</button>
+<button class="header-action" id="language-button" aria-haspopup="dialog"><img src="assets/icons/Icon_earth.svg" alt=""><span id="language-label">中文</span></button>
+</nav></header>
+<div class="payment-body"><div class="payment-heading"><a class="back-history" href="menu.html?view=history"><img class="payment-arrow" src="assets/icons/Icon_dropdown-right.svg" alt="" aria-hidden="true">返回點餐紀錄</a><h1>結帳</h1></div>
+<form id="payment-form" class="payment-layout">
+<div class="payment-column"><section class="payment-card"><h2>用餐資訊</h2><dl class="dining-info" id="dining-info"></dl></section>
+<section class="payment-card"><details class="meal-details" open><summary>餐點內容 <span id="item-count"></span><img class="payment-arrow meal-arrow" src="assets/icons/Icon_dropdown-down.svg" alt="" aria-hidden="true"></summary><div id="payment-items"></div></details></section>
+</div>
+<div class="payment-column payment-right"><x-dc><div class="mobile-payment-content"><div style="background: #FFFFFF; border-radius: 12px; padding: 16px; padding-top: 12px; padding-bottom: 12px">
+      <sc-if value="{{ notLoggedIn }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:0 2px 14px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:20px;">總計</span>
+          <span style="font-size:24px;font-weight:700;">{{ memberSubtotalText }}</span>
+        </div>
+        <button type="button" onClick="{{ onLogin }}" style="width: 100%; border: 1px solid #E0E0E0; background: #FFFFFF; color: #3E3E3E; font-family: inherit; font-size:20px; font-weight: 700; padding: 14px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; height: 50px">
+          <img src="assets/icons/Icon_fun.svg" alt="" style="width:24px;height:24px;display:block;flex-shrink:0;">
+          登入瘋美食會員查優惠
+        </button>
+        <div style="margin-top:14px;">
+          <button type="button" onClick="{{ codeOffer.onToggle }}" style="{{ codeOffer.rowStyle }}">
+            <span style="display:flex;align-items:center;gap:8px;font-size:20px;color:#3E3E3E;">
+              {{ codeOffer.label }}
+              <img class="payment-arrow" src="assets/icons/Icon_dropdown-right.svg" alt="" aria-hidden="true">
+            </span>
+            <span style="{{ codeOffer.amtStyle }}">{{ codeOffer.amtText }}</span>
+          </button>
+          <sc-for list="{{ codeOffer.subLines }}" as="sl" hint-placeholder-count="0">
+            <div style="display:flex;align-items:center;gap:10px;padding:0 2px;margin-top:2px;">
+              <span style="font-size:18px;color:#9A9A9A;">{{ sl.label }}</span>
+              <sc-if value="{{ sl.cancel }}" hint-placeholder-val="">
+                <button type="button" onClick="{{ sl.onCancel }}" style="border:none;background:none;padding:0;color:#DE052E;font-size:18px;font-family:inherit;cursor:pointer;text-decoration:underline;flex-shrink:0;">取消使用</button>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top:16px;border-top:1px solid #F6F6F6;padding:16px 2px 0;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:20px;">付款金額</span>
+          <span style="font-size:22px;font-weight:700;">{{ memberPayableText }}</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ loggedIn }}" hint-placeholder-val="">
+        <div style="padding:0 2px 14px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:20px;">總計</span>
+          <span style="font-size:24px;font-weight:700;">{{ memberSubtotalText }}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ memberOffers }}" as="o" hint-placeholder-count="3">
+            <div>
+              <button type="button" onClick="{{ o.onToggle }}" style="{{ o.rowStyle }}">
+                <span style="display:flex;align-items:center;gap:8px;font-size:20px;color:#3E3E3E;">
+                  <sc-if value="{{ o.showP }}" hint-placeholder-val="">
+                    <span style="width:24px;height:24px;border-radius:50%;background:#DE052E;color:#FFFFFF;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">P</span>
+                  </sc-if>
+                  {{ o.label }}
+                  <img class="payment-arrow" src="assets/icons/Icon_dropdown-right.svg" alt="" aria-hidden="true">
+                </span>
+                <span style="{{ o.amtStyle }}">{{ o.amtText }}</span>
+              </button>
+              <sc-if value="{{ o.note }}" hint-placeholder-val="">
+                <div style="font-size:18px;color:#9A9A9A;padding:0 2px;margin-top:2px;">{{ o.note }}</div>
+              </sc-if>
+              <sc-for list="{{ o.subLines }}" as="sl" hint-placeholder-count="0">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 2px;margin-top:2px;">
+                  <span style="display:flex;align-items:center;gap:10px;min-width:0;">
+                    <span style="font-size:18px;color:#9A9A9A;">{{ sl.label }}</span>
+                    <sc-if value="{{ sl.cancel }}" hint-placeholder-val="">
+                      <button type="button" onClick="{{ sl.onCancel }}" style="border:none;background:none;padding:0;color:#DE052E;font-size:18px;font-family:inherit;cursor:pointer;text-decoration:underline;flex-shrink:0;">取消使用</button>
+                    </sc-if>
+                  </span>
+                  <span style="{{ sl.amtStyle }}">{{ sl.amtText }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top:16px;border-top:1px solid #F6F6F6;padding:16px 2px 0;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:20px;">付款金額</span>
+          <span style="font-size:22px;font-weight:700;">{{ memberPayableText }}</span>
+        </div>
+      </sc-if>
+    </div>
+
+    <!-- 付款方式 -->
+    <div style="background: #FFFFFF; border-radius: 12px; padding: 16px; padding-top: 12px; padding-bottom: 12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <span style="font-size:24px;font-weight:700;">付款方式</span>
+        <span style="background:#FEF2F2;color:#DE052E;font-size:18px;padding:2px 8px;border-radius:6px;">必選</span>
+      </div>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;">
+        <sc-for list="{{ payMethods }}" as="m" hint-placeholder-count="3">
+              <button type="button" onClick="{{ m.onSelect }}" style="{{ m.cardStyle }}">
+                <span style="width:22px;height:22px;border-radius:50%;border:2px solid {{ m.ring }};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+                  <span style="width:11px;height:11px;border-radius:50%;background:{{ m.dot }};"></span>
+                </span>
+                <span style="display:flex;flex-direction:column;gap:10px;flex:1;">
+                  <span style="font-size:20px;">{{ m.label }}</span>
+                  <sc-if value="{{ m.note }}" hint-placeholder-val="">
+                    <span style="font-size:18px;color:#9B9B9B;">{{ m.note }}</span>
+                  </sc-if>
+                  <sc-if value="{{ m.hasIcons }}" hint-placeholder-val="">
+                    <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                      <img src="assets/icons/Icon_creditcard.svg" alt="信用卡" style="height:20px;display:block;">
+                      <img src="assets/icons/Icon_applepay.svg" alt="Apple Pay" style="height:20px;display:block;">
+                      <img src="assets/icons/Icon_googlepay.svg" alt="Google Pay" style="height:20px;display:block;">
+                      <img src="assets/icons/Icon_linepay.svg" alt="LINE Pay" style="height:20px;display:block;">
+                    </span>
+                  </sc-if>
+                </span>
+              </button>
+        </sc-for>
+      </div>
+      <div style="margin-top:18px;font-size:18px;line-height:1.55;color:#8A8A8A;">
+        <div style="font-weight:700;color:#222222;">確認付款後，我們將立即為您現做美味餐點。</div>
+        <div>進入備餐程序後恕無法取消或更改訂單，敬請見諒。</div>
+      </div>
+    </div>
+
+    <!-- 發票資訊 -->
+    <div style="background: #FFFFFF; border-radius: 12px; padding: 16px; padding-top: 12px; padding-bottom: 12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <span style="font-size:24px;font-weight:700;">發票資訊</span>
+        <sc-if value="{{ showPayment }}" hint-placeholder-val="{{ true }}">
+          <span style="background:#FEF2F2;color:#DE052E;font-size:18px;padding:2px 8px;border-radius:6px;">必選</span>
+        </sc-if>
+      </div>
+      <sc-if value="{{ zeroPayable }}" hint-placeholder-val="">
+        <div style="margin-top:14px;font-size:18px;color:#5B5B5B;line-height:1.6;">{{ invoiceZeroNote }}</div>
+      </sc-if>
+      <sc-if value="{{ showPayment }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:14px;">
+        <sc-for list="{{ invoiceMethods }}" as="m" hint-placeholder-count="5">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <button type="button" onClick="{{ m.onSelect }}" style="border:none;background:none;padding:0;display:flex;align-items:flex-start;gap:12px;cursor:pointer;text-align:left;">
+              <span style="width:22px;height:22px;border-radius:50%;border:2px solid {{ m.ring }};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+                <span style="width:11px;height:11px;border-radius:50%;background:{{ m.dot }};"></span>
+              </span>
+              <span>
+                <span style="font-size:20px;display:block;">{{ m.label }}</span>
+                <sc-if value="{{ m.note }}" hint-placeholder-val="">
+                  <span style="font-size:18px;color:#5B5B5B;display:block;margin-top:2px;">{{ m.note }}</span>
+                </sc-if>
+              </span>
+            </button>
+            <sc-if value="{{ m.showFields }}" hint-placeholder-val="">
+              <div style="display:flex;flex-direction:column;gap:12px;padding-left:34px;">
+                <sc-for list="{{ m.fields }}" as="f" hint-placeholder-count="1">
+                  <div>
+                    <input type="text" value="{{ f.value }}" placeholder="{{ f.placeholder }}" onChange="{{ f.onChange }}" style="{{ f.inputStyle }}">
+                    <sc-if value="{{ f.error }}" hint-placeholder-val="">
+                      <div style="color:#DE3B05;font-size:18px;margin-top:6px;">{{ f.error }}</div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- 會員資訊 -->
+    <div style="background:#FFFFFF;border-radius:12px;padding:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <span style="font-size:24px;font-weight:700;color:#222222;">會員資訊</span>
+        <span style="background:#FEF2F2;color:#DE052E;font-size:18px;padding:3px 9px;border-radius:6px;">必選</span>
+      </div>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:12px;">
+        <label style="height:52px;border:1px solid #C8C9C9;border-radius:12px;padding:0 16px;display:flex;align-items:center;gap:10px;background:#FFFFFF;">
+          <img src="assets/icons/Icon_user_red.svg" width="21" height="21" alt="會員姓名">
+          <input type="text" value="{{ memberNickname }}" onChange="{{ onMemberNicknameChange }}" onInput="{{ onMemberNicknameChange }}" aria-label="會員暱稱" style="flex:1;min-width:0;border:none;outline:none;background:transparent;font-family:inherit;font-size:20px;color:#3E3E3E;padding:0;">
+        </label>
+        <label style="height:52px;border:1px solid #C8C9C9;border-radius:12px;padding:0 16px;display:flex;align-items:center;gap:10px;background:#FFFFFF;">
+          <img src="assets/icons/Icon_phone.svg" width="21" height="21" alt="手機號碼">
+          <input type="tel" inputmode="tel" value="{{ memberPhone }}" onChange="{{ onMemberPhoneChange }}" onInput="{{ onMemberPhoneChange }}" aria-label="手機號碼" style="flex:1;min-width:0;border:none;outline:none;background:transparent;font-family:inherit;font-size:20px;color:#3E3E3E;padding:0;">
+        </label>
+      </div>
+    </div>
+
+    <!-- 付款方式說明 -->
+    <div style="background:#FFFFFF;border-radius:12px;padding:16px;">
+      <div style="font-size:24px;font-weight:700;color:#222222;">付款方式說明</div>
+      <div style="margin-top:12px;font-size:18px;line-height:1.55;color:#3E3E3E;">
+        <div>※線上付款不支援核銷紙本禮券、商品卡、LINE優惠券核銷。</div>
+        <div>※優惠碼僅適用於該筆訂單消費單鍋，不適用多鍋訂單。</div>
+        <div>※如單筆訂單欲使用多鍋優惠，請選擇現場結帳。</div>
+      </div>
+    </div></div><div class="mobile-payment-modals">  <!-- 付款方式說明 Popup -->
+  <sc-if value="{{ showPaymentInfoModal }}" hint-placeholder-val="{{ true }}">
+    <div class="checkout-modal-backdrop" style="position:fixed;inset:0;z-index:90;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:16px;">
+      <div role="dialog" aria-modal="true" tabIndex="-1" onClick="{{ stopModal }}" class="sheet-modal" style="width:100%;max-width:350px;background:#FFFFFF;border-radius:12px;overflow:hidden;font-family:'Noto Sans TC','Roboto',sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.22);">
+        <div style="height:52px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #EEEEEE;font-size:26px;font-weight:700;color:#111111;">付款方式說明</div>
+        <div style="padding:8px 12px 12px;">
+          <div style="padding:12px;font-size:20px;line-height:1.45;color:#222222;">
+            <div>※線上付款不支援核銷紙本禮券、商品卡、LINE優惠券核銷。</div>
+            <div>※優惠碼僅適用於該筆訂單消費單鍋；不適用多鍋訂單。</div>
+            <div>※如單筆訂單欲使用多鍋優惠，請選擇現場結帳。</div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:8px;">
+            <button type="button" onClick="{{ selectInfoOnsite }}" style="height:42px;flex:1;border:1.5px solid #DE052E;border-radius:9px;background:#FFFFFF;color:#DE052E;font-family:inherit;font-size:20px;font-weight:700;cursor:pointer;">現場付款</button>
+            <sc-if value="{{ onlinePaymentAvailable }}" hint-placeholder-val="{{ true }}">
+              <button type="button" onClick="{{ selectInfoOnline }}" style="height:42px;flex:1;border:1.5px solid #DE052E;border-radius:9px;background:#DE052E;color:#FFFFFF;font-family:inherit;font-size:20px;font-weight:700;cursor:pointer;">線上支付</button>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- 瘋點數折抵 Popup -->
+  <sc-if value="{{ showPointsModal }}" hint-placeholder-val="">
+    <div class="checkout-modal-backdrop" onClick="{{ closePointsModal }}" style="position:fixed;inset:0;z-index:50;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div role="dialog" aria-modal="true" tabIndex="-1" onClick="{{ stopModal }}" style="width:min(560px,100%);background:#FFFFFF;border-radius:16px;overflow:hidden;font-family:'Noto Sans TC','Roboto',sans-serif;">
+        <div style="position:relative;height:54px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #F6F6F6;">
+          <button type="button" aria-label="關閉瘋點數折抵" onClick="{{ closePointsModal }}" style="position: absolute; right: 16px; top: 25px; transform: translateY(-50%); border: none; background: none; padding: 6px; cursor: pointer; display: flex">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3E3E3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          <span style="font-size:24px;font-weight:700;">使用瘋點數折抵</span>
+        </div>
+
+        <div style="padding:18px 20px 20px;">
+          <div style="border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; background-color: #fef2f2">
+            <span style="width: 20px; height: 20px; border-radius: 50%; color: #FFFFFF; font-size:18px; font-weight: 700; display: flex; align-items: center; justify-content: center; background-color: #dd0026">P</span>
+            <span style="font-size:20px;font-weight:700;color:#3E3E3E;">1 = 1 元</span>
+          </div>
+
+          <div style="margin-top:18px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:20px;color:#3E3E3E;">帳戶點數餘額</span>
+            <span style="display:flex;align-items:center;gap:6px;">
+              <span style="width: 20px; height: 20px; border-radius: 50%; color: #FFFFFF; font-size:18px; font-weight: 700; display: flex; align-items: center; justify-content: center; background-color: #dd0026">P</span>
+              <span style="font-size:20px;font-weight:700;">{{ pointsBalanceText }}</span>
+            </span>
+          </div>
+
+          
+          <sc-if value="{{ ptsError }}" hint-placeholder-val="">
+            <div style="text-align:right;color:#DE3B05;font-size:18px;margin-top:8px;">{{ ptsError }}</div>
+          </sc-if>
+
+          <div style="margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%">
+            
+            
+          <div style="display: flex; align-items: center; gap: 8px; align-self: center">
+              
+              
+            <span style="font-size:20px; color: #3E3E3E; flex: 1; display: flex; align-items: center; width: 110px; height: 41px">本次使用</span></div><span style="width: 20px; height: 20px; border-radius: 50%; color: #FFFFFF; font-size:18px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background-color: #dd0026">P</span><input type="text" inputmode="numeric" value="{{ pointsInput }}" placeholder="0" onChange="{{ onPointsInput }}" onInput="{{ onPointsInput }}" style="height: 40px; width: 149px; border-radius: 8px; border-width: 1px; border-style: solid; border-color: #c8c9c9; font-size:24px; text-align: right"></div><button type="button" onClick="{{ confirmPoints }}" style="height: 50px; width: 100%; margin-top: 20px; color: #ffffff; background-color: #dd0026; border-radius: 16px; border-width: 1px; border-style: none; border-color: #000000; font-size:26px; font-weight: 500">確認</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- 優惠碼 Popup -->
+  <sc-if value="{{ showCodeModal }}" hint-placeholder-val="">
+    <div class="checkout-modal-backdrop" onClick="{{ closeCodeModal }}" style="position:fixed;inset:0;z-index:50;background:rgba(0,0,0,0.45);display:flex;align-items:flex-end;justify-content:center;">
+      <div role="dialog" aria-modal="true" tabIndex="-1" onClick="{{ stopModal }}" class="sheet-modal checkout-discount-modal" style="width:100%;height:92dvh;max-height:92dvh;background:#FFFFFF;border-radius:16px 16px 0 0;display:flex;flex-direction:column;overflow:hidden;position:relative;font-family:'Noto Sans TC','Roboto',sans-serif;">
+        <div style="position:relative;height:56px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #F6F6F6;flex-shrink:0;">
+          <button type="button" aria-label="關閉使用優惠" onClick="{{ closeCodeModal }}" style="position: absolute; right: 16px; top: 27px; transform: translateY(-50%); border: none; background: none; padding: 6px; cursor: pointer; display: flex">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3E3E3E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          <span style="font-size:24px;font-weight:700;">{{ codeTitle }}</span>
+        </div>
+
+        <div style="flex:1;overflow-y:auto;padding:18px 16px;">
+          <sc-if value="{{ showDiscountTabs }}" hint-placeholder-val="">
+            <div style="display:flex;border-bottom:1px solid #F6F6F6;margin-bottom:18px;">
+              <button type="button" onClick="{{ selectCodeTab }}" style="{{ codeTabStyle }}">優惠碼</button>
+              <button type="button" onClick="{{ selectVoucherTab }}" style="{{ voucherTabStyle }}">優惠券</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showCodeTab }}" hint-placeholder-val="{{ true }}">
+          <input type="text" value="{{ codeInput }}" placeholder="請輸入優惠碼" onChange="{{ onCodeInput }}" onInput="{{ onCodeInput }}" style="{{ codeInputStyle }}">
+
+          <sc-if value="{{ codeValid }}" hint-placeholder-val="">
+            <div style="margin-top:18px;color:#DE052E;font-size:24px;font-weight:700;">指定商品_買鍋送鴨血豆腐</div>
+            <div style="margin-top:14px;font-size:20px;font-weight:700;color:#222222;">需滿足條件</div>
+            <div style="margin-top:10px;padding:14px;border:1px solid #E5E5E5;border-radius:12px;">
+              <div style="display:flex;justify-content:space-between;gap:12px;font-size:20px;font-weight:500;"><span>購物車滿 NT$500</span><span><b style="color:#DE052E;">{{ campaignSpend }}</b> / 500</span></div>
+              <div style="margin-top:8px;color:#5B5B5B;font-size:18px;">目前 <b style="color:#DE052E;">NT${{ campaignSpend }}</b>，還差 <b style="color:#DE052E;">NT${{ campaignRemaining }}</b></div>
+              <div style="height:4px;margin-top:14px;border-radius:99px;background:#E5E5E5;overflow:hidden;"><div style="{{ campaignProgressStyle }}"></div></div>
+              <div style="display:flex;justify-content:space-between;gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid #EEEEEE;font-size:20px;font-weight:500;"><span>購買指定商品 1 件</span><span><b style="color:#DE052E;">{{ campaignProductCount }}</b> / 1 件</span></div>
+            </div>
+
+            <div style="margin-top:20px;">
+              <button type="button" onClick="{{ toggleCampaignProducts }}" style="width:100%;padding:0;border:none;background:none;display:flex;justify-content:space-between;align-items:center;font-family:inherit;font-size:24px;font-weight:700;color:#222222;cursor:pointer;"><span>需加入指定商品</span><img src="assets/icons/Icon_dropdown-down.svg" style="{{ campaignProductsArrowStyle }}" width="20" height="20" alt="展開或收合"></button>
+              <sc-if value="{{ campaignProductsOpen }}" hint-placeholder-val="">
+                <div style="margin-top:8px;padding:0 14px;border:1px solid #E5E5E5;border-radius:12px;">
+                  <sc-for list="{{ availableCodeItemRows }}" as="it" hint-placeholder-count="2">
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #EEEEEE;">
+                      <div style="flex:1;min-width:0;"><div style="font-size:20px;color:#333333;">{{ it.name }}</div><div style="margin-top:4px;font-size:20px;color:#333333;">NT${{ it.price }}</div></div>
+                      <sc-if value="{{ it.showAdd }}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{ it.onPlus }}" aria-label="加入購物車" style="{{ it.plusStyle }}">＋ 加入購物車</button></sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="margin-top:20px;">
+              <button type="button" onClick="{{ toggleCampaignReward }}" style="width:100%;padding:0;border:none;background:none;display:flex;justify-content:space-between;align-items:center;font-family:inherit;font-size:24px;font-weight:700;color:#222222;cursor:pointer;"><span>可享優惠</span><img src="assets/icons/Icon_dropdown-down.svg" style="{{ campaignRewardArrowStyle }}" width="20" height="20" alt="展開或收合"></button>
+              <sc-if value="{{ campaignRewardOpen }}" hint-placeholder-val="">
+                <div style="margin-top:8px;padding:14px;border:1px solid #E5E5E5;border-radius:12px;opacity:{{ campaignRewardOpacity }};display:flex;align-items:center;gap:12px;">
+                  <div style="flex:1;min-width:0;"><div style="font-size:20px;color:#333333;">鴨血豆腐</div><div style="margin-top:4px;color:#DE052E;font-size:20px;font-weight:500;">$39 (限1份)</div></div>
+                  <sc-if value="{{ showCampaignRewardAdd }}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{ openCampaignReward }}" aria-label="加入購物車" style="{{ campaignRewardAddStyle }}">＋ 加入購物車</button></sc-if>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="margin-top:20px;">
+              <button type="button" onClick="{{ toggleCampaignNotes }}" style="width:100%;padding:0;border:none;background:none;display:flex;justify-content:space-between;align-items:center;font-family:inherit;font-size:24px;font-weight:700;color:#222222;cursor:pointer;"><span>注意事項</span><img src="assets/icons/Icon_dropdown-down.svg" style="{{ campaignNotesArrowStyle }}" width="20" height="20" alt="展開或收合"></button>
+              <sc-if value="{{ campaignNotesOpen }}" hint-placeholder-val=""><div style="margin-top:8px;font-size:18px;color:#5B5B5B;line-height:1.7;"><div>1.持券人可至本券指定適用品牌門店使用</div><div>2.本券可兌換券上所載之指定商品，恕不得自行要求更換其他商品</div></div></sc-if>
+            </div>
+          </sc-if>
+          </sc-if>
+
+          <sc-if value="{{ showVoucherTab }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:2px;display:flex;flex-direction:column;gap:14px;">
+              <sc-for list="{{ voucherRows }}" as="v" hint-placeholder-count="3">
+                <button type="button" onClick="{{ v.onSelect }}" style="{{ v.cardStyle }}">
+                  <span style="{{ v.valueBlockStyle }}">
+                    <sc-if value="{{ v.denomTop }}" hint-placeholder-val=""><span style="{{ v.denomTopStyle }}">{{ v.denomTop }}</span></sc-if>
+                    <span style="{{ v.denomBigStyle }}">{{ v.denomBig }}</span>
+                    <sc-if value="{{ v.denomBottom }}" hint-placeholder-val=""><span style="{{ v.denomBottomStyle }}">{{ v.denomBottom }}</span></sc-if>
+                  </span>
+                  <span style="flex:1;min-width:0;padding:12px 12px 12px 0;">
+                    <span style="{{ v.titleStyle }}">{{ v.couponTitle }}</span>
+                    <span style="{{ v.metaStyle }}">使用期限: {{ v.couponPeriod }}</span>
+                    <span style="{{ v.metaStyle }}">使用次數: {{ v.couponTimes }}</span>
+                    <span style="display:flex;gap:14px;margin-top:8px;">
+                      <sc-for list="{{ v.couponTags }}" as="t" hint-placeholder-count="2">
+                        <span style="{{ v.tagStyle }}">{{ t }}</span>
+                      </sc-for>
+                    </span>
+                  </span>
+                  <sc-if value="{{ v.showCheck }}" hint-placeholder-val="">
+                    <span style="position:absolute;right:0;bottom:0;width:34px;height:34px;background:#DE052E;border-top-left-radius:10px;border-bottom-right-radius:12px;display:flex;align-items:center;justify-content:center;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </span>
+                  </sc-if>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="flex-shrink:0;border-top:1px solid #F6F6F6;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+          <div>
+            <div style="font-size:18px;color:#5B5B5B;">優惠(NT$)</div>
+            <div style="font-size:22px;font-weight:700;color:#DE052E;margin-top:2px;">{{ codeDiscountText }}</div>
+          </div>
+          <button type="button" onClick="{{ confirmCode }}" style="{{ codeConfirmStyle }}">確認</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showCodeLeaveModal }}" hint-placeholder-val="">
+    <div class="checkout-modal-backdrop" style="position:fixed;inset:0;z-index:110;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div role="dialog" aria-modal="true" tabIndex="-1" onClick="{{ stopModal }}" style="width:100%;max-width:342px;background:#FFFFFF;border-radius:16px;padding:24px 20px 18px;box-shadow:0 8px 28px rgba(0,0,0,.18);font-family:'Noto Sans TC','Roboto',sans-serif;">
+        <div style="font-size:26px;font-weight:700;color:#222222;text-align:center;">尚未達成優惠條件，是否確認離開?</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px;">
+          <button type="button" onClick="{{ confirmLeaveCode }}" style="height:46px;border:1px solid #DE052E;border-radius:12px;background:#FFFFFF;color:#DE052E;font-family:inherit;font-size:20px;font-weight:500;cursor:pointer;">離開</button>
+          <button type="button" onClick="{{ continueCodeOrder }}" style="height:46px;border:1px solid #DE052E;border-radius:12px;background:#DE052E;color:#FFFFFF;font-family:inherit;font-size:20px;font-weight:500;cursor:pointer;">繼續加點</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- 移除折扣品項確認 Popup -->
+  <sc-if value="{{ showRemoveDiscountModal }}" hint-placeholder-val="">
+    <div class="checkout-modal-backdrop" style="position:fixed;inset:0;z-index:80;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div role="dialog" aria-modal="true" tabIndex="-1" onClick="{{ stopModal }}" class="sheet-modal" style="width:100%;max-width:342px;background:#FFFFFF;border-radius:16px;padding:24px 20px 18px;font-family:'Noto Sans TC','Roboto',sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.18);">
+        <div style="font-size:26px;font-weight:700;color:#222222;text-align:center;">確認移除折扣品項?</div>
+        <div style="margin-top:12px;font-size:20px;line-height:1.6;color:#5B5B5B;text-align:center;"><b style="color:#3E3E3E;">{{ removeDiscountName }}</b> 將從購物車中移除，且不再使用此優惠折抵。</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px;">
+          <button type="button" onClick="{{ cancelRemoveDiscount }}" style="height:46px;border:1px solid #C8C9C9;border-radius:12px;background:#FFFFFF;color:#3E3E3E;font-family:inherit;font-size:20px;font-weight:500;cursor:pointer;">取消</button>
+          <button type="button" onClick="{{ confirmRemoveDiscount }}" style="height:46px;border:1px solid #DE052E;border-radius:12px;background:#DE052E;color:#FFFFFF;font-family:inherit;font-size:20px;font-weight:500;cursor:pointer;">確認</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- 選擇電子禮券 Popup -->
+  <sc-if value="{{ showGiftModal }}" hint-placeholder-val="">
+    <div class="checkout-modal-backdrop" onClick="{{ closeGiftModal }}" style="position:fixed;inset:0;z-index:50;background:rgba(0,0,0,0.45);display:flex;align-items:flex-end;justify-content:center;">
+      <div role="dialog" aria-modal="true" tabIndex="-1" onClick="{{ stopModal }}" class="sheet-modal" style="width:100%;height:92dvh;max-height:92dvh;background:#FFFFFF;border-radius:16px 16px 0 0;display:flex;flex-direction:column;overflow:hidden;position:relative;font-family:'Noto Sans TC','Roboto',sans-serif;">
+        <div style="position:relative;flex-shrink:0;height:64px;background:#DE052E;overflow:hidden;">
+          <div style="position:absolute;right:-30px;top:-34px;width:150px;height:110px;background:rgba(255,255,255,0.10);border-radius:50%;"></div>
+          <div style="position:absolute;right:26px;bottom:-26px;width:90px;height:70px;background:rgba(255,255,255,0.08);border-radius:50%;"></div>
+          <button type="button" aria-label="關閉電子禮券" onClick="{{ closeGiftModal }}" style="position:absolute;right:14px;top:14px;border:none;background:none;padding:6px;cursor:pointer;display:flex;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <div style="flex-shrink:0;display:flex;align-items:center;gap:9px;padding:16px 16px 10px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DE052E" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line><line x1="7" y1="7" x2="17" y2="17"></line><line x1="17" y1="7" x2="7" y2="17"></line></svg>
+          <span style="font-size:26px;font-weight:700;">選擇電子禮券</span>
+        </div>
+
+        <div style="flex:1;overflow-y:auto;padding:4px 16px 16px;display:flex;flex-direction:column;gap:14px;">
+          <sc-for list="{{ giftRows }}" as="v" hint-placeholder-count="3">
+            <button type="button" onClick="{{ v.onSelect }}" style="{{ v.cardStyle }}">
+              <span style="width:108px;height:74px;border-radius:8px;flex-shrink:0;position:relative;overflow:hidden;background-image:url('assets/menu.jpg');background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;">
+                <span style="position:absolute;inset:0;background:rgba(0,0,0,0.38);"></span>
+                <span style="position:relative;font-size:18px;font-weight:700;color:#FCAE42;">{{ v.brand }}</span>
+                <span style="position:relative;font-size:18px;font-weight:700;color:#FFFFFF;">開幕慶</span>
+              </span>
+              <span style="flex:1;min-width:0;">
+                <span style="display:block;font-size:20px;line-height:1.4;color:#3E3E3E;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{{ v.name }}</span>
+                <span style="display:block;font-size:18px;color:#5B5B5B;margin-top:6px;">期限:{{ v.period }}</span>
+                <span style="display:block;font-size:18px;color:#5B5B5B;margin-top:2px;">使用次數:{{ v.times }}</span>
+                <span style="display:flex;gap:14px;margin-top:8px;">
+                  <sc-for list="{{ v.tags }}" as="t" hint-placeholder-count="2">
+                    <span style="font-size:18px;color:#FCAE42;">{{ t }}</span>
+                  </sc-for>
+                </span>
+              </span>
+              <sc-if value="{{ v.selected }}" hint-placeholder-val="">
+                <span style="position:absolute;right:0;bottom:0;width:34px;height:34px;background:#DE052E;border-top-left-radius:10px;border-bottom-right-radius:10px;display:flex;align-items:center;justify-content:center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </span>
+              </sc-if>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="flex-shrink:0;border-top:1px solid #F6F6F6;padding:12px 16px;">
+          <button type="button" onClick="{{ confirmGift }}" style="{{ giftConfirmStyle }}">確認</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div></x-dc></div></form>
+<footer class="payment-footer"><div><span>付款金額:</span><strong id="footer-total">NT$ 750</strong></div><button type="button" id="pay-button">前往付款</button></footer></div></main>
+<dialog id="detail" aria-labelledby="detail-title"><div class="detail-layout"><div class="detail-summary"><img class="dish-photo" src="assets/menu.jpg" alt=""><div class="dish-copy"><p class="eyebrow" id="detail-category"></p><h2 id="detail-title"></h2><p id="detail-description"></p></div></div><div class="detail-options"><button class="close-button" id="close-detail" aria-label="關閉商品詳情"><img src="assets/icons/Icon_close.svg" alt=""></button><div class="options-scroll"><div class="detail-product-heading"><h2 id="detail-option-title"></h2><strong id="detail-price"></strong></div><section class="flavor-section" aria-label="口味與自訂備註"><div class="flavor-options" aria-label="口味選擇"><button type="button" class="flavor-option" data-flavor="加辣" aria-pressed="false">加辣</button><button type="button" class="flavor-option" data-flavor="不要香菜" aria-pressed="false">不要香菜</button><button type="button" class="flavor-option" id="custom-flavor" aria-pressed="false" aria-expanded="false" aria-controls="meal-note">+自訂備註</button></div><textarea id="meal-note" maxlength="200" placeholder="請輸入備註" aria-label="自訂口味備註" hidden></textarea></section><div id="option-groups"></div></div></div></div><footer class="detail-footer"><div class="stepper"><button id="minus" aria-label="減少餐點數量">−</button><output id="quantity">1</output><button id="plus" aria-label="增加餐點數量">＋</button></div><div class="detail-feedback"><p id="validation" aria-live="polite"></p><p id="detail-limit" aria-label="點餐份數限制"></p></div><button id="add-cart" class="add-cart"></button></footer></dialog>
+<dialog id="service-dialog" aria-labelledby="service-title"><button class="close-button" id="close-service" aria-label="關閉服務鈴選單"><img src="assets/icons/Icon_close.svg" alt=""></button><h2 id="service-title">服務鈴</h2><div class="service-options"></div><button class="service-confirm" id="confirm-service" disabled>確定</button></dialog>
+<dialog id="language-dialog" aria-labelledby="language-title"><button class="close-button" id="close-language" aria-label="關閉語言選擇"><img src="assets/icons/Icon_close.svg" alt=""></button><h2 id="language-title">語言選擇</h2><div class="service-options" aria-label="語言"><button class="service-option" data-language="zh-Hant" aria-pressed="false">中文</button><button class="service-option" data-language="en" aria-pressed="false">English</button><button class="service-option" data-language="ja" aria-pressed="false">日本語</button></div><button class="service-confirm" id="confirm-language" disabled>確定</button></dialog>
+<dialog id="mobile-order-dialog" aria-labelledby="mobile-order-title"><button class="close-button" id="close-mobile-order" aria-label="關閉手機掃碼點餐"><img src="assets/icons/Icon_close.svg" alt=""></button><h2 id="mobile-order-title">手機掃碼點餐</h2><img class="mobile-order-qrcode" src="assets/qrcode.png" alt="手機點餐 QR code"></dialog>
+<dialog id="survey-dialog" aria-labelledby="survey-title"><button class="close-button" id="close-survey" aria-label="關閉滿意度回饋"><img src="assets/icons/Icon_close.svg" alt=""></button><h2 id="survey-title">手機掃碼填寫滿意度回饋</h2><img class="mobile-order-qrcode" src="assets/qrcode.png" alt="滿意度回饋 QR code"></dialog>
+<dialog id="member-dialog" aria-labelledby="member-title">
+<button class="close-button" id="close-member" aria-label="關閉會員中心"><img src="assets/icons/Icon_close.svg" alt=""></button>
+<h2 id="member-title">會員中心</h2>
+<div id="member-guest"><button class="member-login" id="member-login"><img src="assets/icons/Icon_fun.svg" alt="">登入瘋美食會員</button></div>
+<div id="member-account" hidden>
+<h3>瘋美食會員(<span id="member-name">Anna</span>)</h3>
+<ul class="member-benefits">
+<li><img src="assets/icons/Icon_point.svg" alt=""><span>瘋點數 <strong>1,000</strong> 點</span></li>
+<li><img src="assets/icons/Icon_coupon.svg" alt=""><span>優惠券 <strong>1</strong> 張</span></li>
+<li><img src="assets/icons/Icon_gift-voucher.svg" alt=""><span>電子禮券 0 張</span></li>
+</ul>
+<button class="member-logout" id="member-logout">登出</button>
+</div>
+</dialog>
+
+
+<div id="menu-toast" role="status" aria-live="polite"></div><script src="js/tablet-order-view.js"></script><script src="js/payment.js"></script><script src="js/tablet-product-options.js"></script><script src="js/payment-product-detail.js"></script><script src="js/tablet-payment-logic.js"></script><script src="js/tablet-header.js"></script><script type="text/x-dc" data-dc-script>class Component extends window.createTabletPaymentLogic(DCLogic) {}</script><script src="js/checkout-runtime.js"></script></body></html>

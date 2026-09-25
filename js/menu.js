@@ -28,41 +28,7 @@ menu[0].items.push(
   { name: '麻辣臭臭鍋', desc: '道地川味麻辣湯底，附鴨血豆腐', price: 260, image: 'assets/menu.jpg', limit: 3, limitLabel: '/1人', limitReached: true },
   { name: '海鮮總匯鍋', desc: '蝦、蛤蜊、魚片一次滿足', price: 320, image: 'assets/menu.jpg', limit: 3, limitLabel: '/1人', soldOut: true }
 );
-const optionGroups = [
-      { id: 'base', title: '選料底', required: true, mode: 'single', max: 1, hint: '必須選 1 項', items: [
-        { id: 'b1', name: '肉好好', img: true },
-        { id: 'b2', name: '菜好好', soldOut: true, img: true },
-        { id: 'b3', name: '漿漿好', add: 50, img: true },
-        { id: 'b4', name: '總匯好', add: 80, img: true },
-      ]},
-      { id: 'meat', title: '選肉品', required: true, mode: 'single', max: 1, hint: '必須選 1 項', items: [
-        { id: 'm1', name: '雞肉', img: true },
-        { id: 'm2', name: '豬肉', add: 20, img: true },
-        { id: 'm3', name: '牛肉', add: 60, img: true },
-      ]},
-      { id: 'side', title: '選副餐', required: true, mode: 'multi', max: 2, hint: '最多可選 2 項', items: [
-        { id: 's1', name: '白飯', img: true },
-        { id: 's2', name: '冬粉', add: 10, img: true },
-        { id: 's3', name: '王子麵', add: 15, img: true },
-      ]},
-      { id: 'extra', title: '加購火鍋料', mode: 'multi', max: 2, qty: true, hint: '最多可選 2 項', items: [
-        { id: 'e1', name: '金針菇', add: 15, img: true },
-        { id: 'e2', name: '黑木耳', add: 15, img: true },
-        { id: 'e3', name: '芋香貢丸', add: 30, img: true },
-      ]},
-      { id: 'drink', title: '選飲料', required: true, mode: 'single', max: 1, hint: '最多可選 1 項', items: [
-        { id: 'k1', name: '檸檬冬瓜冰沙', img: true },
-        { id: 'k2', name: '紅茶', img: true, subGroups: [
-          { id: 'ice', title: '冰量', required: true, mode: 'single', hint: '必須選 1 項', items: [
-            { id: 'i1', name: '去冰' }, { id: 'i2', name: '微冰' }, { id: 'i3', name: '正常冰' },
-          ]},
-          { id: 'topping', title: '加料', mode: 'multi', max: 2, hint: '最多可選 2 項', items: [
-            { id: 't1', name: '珍珠', add: 0 }, { id: 't2', name: '綠茶凍', add: 0 }, { id: 't3', name: '杏仁凍', add: 0 },
-          ]},
-        ]},
-        { id: 'k3', name: '黑豆茶', img: true },
-      ]},
-    ];
+const optionGroups = window.TabletProductOptions;
 // Product behavior is explicit and independent of its menu category.
 menu.forEach((category, ci) => category.items.forEach(item => {
   item.mode = ci < 2 || item.name === '古早味紅茶' ? 'options' : 'simple';
@@ -93,11 +59,7 @@ const detail = $('#detail');
 let current, selections = {}, comboPreferences = {}, quantity = 1, cart = [];
 let orderBatches = [], savedOrderNote = '';
 // POS preview rows; replace with the table's POS records when the API is connected.
-const posOrderLines = [
-  { name: '古早味紅茶', unit: 40, qty: 1, flavors: ['去冰'] },
-  { name: '古早味紅茶', unit: 40, qty: -1, flavors: ['去冰'] },
-  { name: '香蒜奶油麵包', unit: 90, qty: 1, note: '服務員加點' }
-];
+const posOrderLines = TabletOrderView.posOrderLines;
 // The tablet draft is separate from the mobile ordering prototype.
 const cartKey = 'tablet-order-cart-v1';
 const validOrderLine = line => line && typeof line.name === 'string' && Number.isInteger(line.qty) && line.qty > 0 && Number.isFinite(line.unit) && line.unit >= 0;
@@ -299,88 +261,15 @@ function handleComboEvent(event) {
   $('.options-scroll').scrollTop = scroll;
 }
 ['click', 'change', 'input'].forEach(type => $('#option-groups').addEventListener(type, handleComboEvent));
-const serviceDialog = $('#service-dialog'); let serviceChoice = '';
-$('#service-bell').onclick = () => {
-  serviceChoice = ''; $('#confirm-service').disabled = true;
-  serviceDialog.querySelector('.service-options').innerHTML = ['清理桌面', '詢問菜單', '出餐延遲'].map(name => `<button class="service-option" aria-pressed="false">${name}</button>`).join('');
-  serviceDialog.showModal();
-};
-serviceDialog.querySelector('.service-options').onclick = event => {
-  const button = event.target.closest('button'); if (!button) return; serviceChoice = button.textContent;
-  serviceDialog.querySelectorAll('.service-option').forEach(el => { el.classList.toggle('selected', el === button); el.setAttribute('aria-pressed', String(el === button)); }); $('#confirm-service').disabled = false;
-};
-$('#close-service').onclick = () => serviceDialog.close();
-$('#confirm-service').onclick = () => { serviceDialog.close(); notify(`已送出：${serviceChoice}`); };
-const mobileOrderDialog = $('#mobile-order-dialog');
-$('#mobile-order-button').onclick = () => mobileOrderDialog.showModal();
-$('#close-mobile-order').onclick = () => mobileOrderDialog.close();
-const surveyDialog = $('#survey-dialog');
-$('#survey-button').onclick = () => surveyDialog.showModal();
-$('#close-survey').onclick = () => surveyDialog.close();
-const memberDialog = $('#member-dialog');
-// Front-end preview only, matching the mobile prototype's membership flag.
-let memberLoggedIn = false;
-function renderMember() {
-  $('#member-guest').hidden = memberLoggedIn;
-  $('#member-account').hidden = !memberLoggedIn;
-}
-$('#member-button').onclick = () => {
-  try { memberLoggedIn = localStorage.getItem('funMember') === '1'; } catch {}
-  renderMember();
-  memberDialog.showModal();
-};
-$('#close-member').onclick = () => memberDialog.close();
-$('#member-login').onclick = () => {
-  try { localStorage.setItem('funMember', '1'); } catch {}
-  memberLoggedIn = true;
-  renderMember();
-  $('#member-logout').focus();
-};
-$('#member-logout').onclick = () => {
-  try { localStorage.removeItem('funMember'); } catch {}
-  memberLoggedIn = false;
-  renderMember();
-  $('#member-login').focus();
-};
-const languageDialog = $('#language-dialog');
-let selectedLanguage = { code: 'zh-Hant', label: '中文' };
-let pendingLanguage = null;
-$('#language-button').onclick = () => {
-  pendingLanguage = { ...selectedLanguage };
-  $('#confirm-language').disabled = false;
-  languageDialog.querySelectorAll('[data-language]').forEach(button => { const active = button.dataset.language === selectedLanguage.code; button.classList.toggle('selected', active); button.setAttribute('aria-pressed', String(active)); });
-  languageDialog.showModal();
-};
-languageDialog.querySelector('.service-options').onclick = event => {
-  const button = event.target.closest('[data-language]');
-  if (!button) return;
-  pendingLanguage = { code: button.dataset.language, label: button.textContent };
-  languageDialog.querySelectorAll('[data-language]').forEach(option => { option.classList.toggle('selected', option === button); option.setAttribute('aria-pressed', String(option === button)); });
-  $('#confirm-language').disabled = false;
-};
-$('#close-language').onclick = () => languageDialog.close();
-$('#confirm-language').onclick = () => {
-  if (!pendingLanguage) return;
-  selectedLanguage = { ...pendingLanguage };
-  $('#language-label').textContent = pendingLanguage.label;
-  try { sessionStorage.setItem('tablet-order-language', JSON.stringify(pendingLanguage)); } catch {}
-  languageDialog.close();
-  notify('已選擇：' + pendingLanguage.label);
-};
-try {
-  const language = JSON.parse(sessionStorage.getItem('tablet-order-language') || 'null');
-  const labels = { 'zh-Hant': '中文', en: 'English', ja: '日本語' };
-  if (language && labels[language.code]) { selectedLanguage = {code:language.code,label:labels[language.code]}; $('#language-label').textContent = selectedLanguage.label; }
-} catch {}
-[detail, serviceDialog, languageDialog, mobileOrderDialog, surveyDialog, memberDialog].forEach(dialog => dialog.addEventListener('click', event => { const rect = dialog.getBoundingClientRect(); if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close(); }));
+[detail].forEach(dialog => dialog.addEventListener('click', event => { const rect = dialog.getBoundingClientRect(); if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close(); }));
 renderCategory(0);
 
 function renderOrderStatus() {
   // Reference mockup copy for this preview; keep saved table-session data intact.
-  $('#status-table').textContent = 'A1桌';
-  $('#status-plan').textContent = '999方案';
-  $('#status-people').textContent = '4大1小';
-  $('#status-opened').textContent = '10:00';
+  $('#status-table').textContent = TabletOrderView.dining[0][1];
+  $('#status-plan').textContent = TabletOrderView.dining[1][1];
+  $('#status-people').textContent = TabletOrderView.dining[2][1];
+  $('#status-opened').textContent = TabletOrderView.dining[3][1];
   $('#status-last').textContent = '10:30';
   $('#status-end').textContent = '11:00';
   $('#status-next').textContent = '05:00';
@@ -470,14 +359,7 @@ function historyLineMarkup(line) {
 }
 function renderOrderHistory() {
   // Fill missing preview groups without persisting demo orders or affecting limits.
-  const previewBatches = [
-    { demo: true, time: '15:20', lines: [{ name: '提拉米蘇', unit: 150, qty: 1 }] },
-    { demo: true, time: '15:35', lines: [
-      { name: '巴斯克乳酪蛋糕', unit: 160, qty: 1 },
-      { name: '古早味紅茶', unit: 40, qty: 2, flavors: ['去冰', '微糖'] }
-    ] }
-  ];
-  const displayBatches = [...orderBatches, ...previewBatches.slice(orderBatches.length)];
+  const displayBatches = TabletOrderView.batches(orderBatches);
   const totalFor = lines => lines.reduce((sum, line) => sum + line.unit * line.qty, 0);
   $('#order-history-list').innerHTML = displayBatches.map((batch, index) => `<section class="history-batch" aria-labelledby="history-batch-${index}"><header class="history-batch-header"><h3 id="history-batch-${index}">第${index + 1}次點餐</h3>${batch.demo ? `<time datetime="${batch.time}">${batch.time}</time>` : `<time datetime="${escapeCartText(batch.createdAt)}">${new Date(batch.createdAt).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })}</time>`}</header><div class="history-lines">${batch.lines.map(historyLineMarkup).join('')}</div>${batch.note ? `<p class="history-note">整單備註：${escapeCartText(batch.note)}</p>` : ''}<p class="history-subtotal">小計 ${money(totalFor(batch.lines))}</p></section>`).join('')
     + `<section class="history-batch history-pos" aria-labelledby="history-pos-title"><header class="history-batch-header"><h3 id="history-pos-title">POS點餐</h3><time datetime="15:40">15:40</time></header><div class="history-lines">${posOrderLines.map(historyLineMarkup).join('')}</div><p class="history-subtotal">小計 ${money(totalFor(posOrderLines))}</p></section>`;
@@ -494,7 +376,11 @@ function openOrderHistory() {
 $('#view-order-history').onclick = openOrderHistory;
 $('#close-order-history').onclick = $('#history-continue').onclick = () => orderHistoryDialog.close();
 orderHistoryDialog.addEventListener('click', event => { if (event.target === $('.history-overlay')) orderHistoryDialog.close(); });
-$('#history-checkout').onclick = () => notify('結帳功能尚未串接，請洽服務人員');
+$('#history-checkout').onclick = () => {
+  try { persistOrderState(); } catch { notify('無法儲存訂單，請重試'); return; }
+  window.location.href = 'payment.html';
+};
+if (new URLSearchParams(location.search).get('view') === 'history') openOrderHistory();
 renderOrderStatus();
 
 // Flavor preferences and the custom note can be selected independently.
