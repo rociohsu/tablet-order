@@ -107,9 +107,9 @@ class MobilePaymentLogic extends DCLogic {
       return { specSel: { ...s.specSel, [gid]: cur } };
     });
   }
-  specRadioRing(sel) { return { width: '22px', height: '22px', borderRadius: '50%', border: '1.5px solid #DE052E', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }; }
-  specRadioDot(sel) { return { width: '12px', height: '12px', borderRadius: '50%', background: sel ? '#DE052E' : 'transparent' }; }
-  specBoxStyle(sel) { return { width: '22px', height: '22px', borderRadius: '6px', border: '1.5px solid ' + (sel ? '#DE052E' : '#C8C9C9'), background: sel ? '#DE052E' : '#FFFFFF', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }; }
+  specRadioRing(sel) { return { width: '22px', height: '22px', borderRadius: '50%', border: '1.5px solid var(--brand)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }; }
+  specRadioDot(sel) { return { width: '12px', height: '12px', borderRadius: '50%', background: sel ? 'var(--brand)' : 'transparent' }; }
+  specBoxStyle(sel) { return { width: '22px', height: '22px', borderRadius: '6px', border: '1.5px solid ' + (sel ? 'var(--brand)' : 'var(--line)'), background: sel ? 'var(--brand)' : 'var(--surface)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }; }
   specPriceLabel(add) { if (add === undefined || add === null) return ''; return '+NT$' + add; }
 
   // 清除因使用優惠碼而加入購物車的品項
@@ -198,20 +198,20 @@ class MobilePaymentLogic extends DCLogic {
       options: it.options && it.options.length ? it.options : [{ label: '單品', detail: '' }],
     }));
     const radio = (selected) => ({
-      ring: selected ? '#DE052E' : '#C8C9C9',
-      dot: selected ? '#DE052E' : 'transparent',
+      ring: selected ? 'var(--brand)' : 'var(--line)',
+      dot: selected ? 'var(--brand)' : 'transparent',
     });
 
     // 會員 / 優惠
     const switchTrack = (on) => ({
       width: '46px', height: '26px', borderRadius: '999px',
-      background: on ? '#DE052E' : '#C8C9C9', position: 'relative',
+      background: on ? 'var(--brand)' : 'var(--line)', position: 'relative',
       transition: 'background .2s', flexShrink: 0, display: 'inline-block',
     });
     const switchKnob = (on) => ({
-      width: '20px', height: '20px', borderRadius: '50%', background: '#FFFFFF',
+      width: '20px', height: '20px', borderRadius: '50%', background: 'var(--surface)',
       position: 'absolute', top: '3px', left: on ? '23px' : '3px',
-      transition: 'left .2s', boxShadow: '0 1px 2px rgba(0,0,0,.2)',
+      transition: 'left .2s', boxShadow: '0 1px 2px color-mix(in srgb, var(--black) 20%, transparent)',
     });
     // 折抵金額計算
     const CART_SUBTOTAL = this.state.discountCartItems.reduce((sum, it) => sum + it.price, 0);
@@ -244,13 +244,13 @@ class MobilePaymentLogic extends DCLogic {
     };
     const amtStyle = (amt) => ({
       fontSize: '18px', fontWeight: '700',
-      color: amt > 0 ? '#DE052E' : '#3E3E3E', flexShrink: 0,
+      color: amt > 0 ? 'var(--brand)' : 'var(--ink)', flexShrink: 0,
     });
     const discountLabel = '使用優惠';
     const discountRowAmt = onsiteEnabled ? codeAmt : (codeAmt + voucherAmt);
     const discountSubLines = [];
-    if (codeApplied) discountSubLines.push({ label: '(優惠碼:' + this.state.codeInput.trim().toUpperCase() + ')', amtText: '', amtStyle: { fontSize: '13px', color: '#9A9A9A' }, cancel: true, onCancel: () => { this.clearCodeCartItems(); this.setState({ codeApplied: false }); } });
-    if (!onsiteEnabled && voucherApplied) { const v = this.vouchers.find(x => x.id === this.state.selectedVoucher); if (v) discountSubLines.push({ label: '(' + v.couponTitle + ')', amtText: '', amtStyle: { fontSize: '13px', color: '#9A9A9A' } }); }
+    if (codeApplied) discountSubLines.push({ label: '(優惠碼:' + this.state.codeInput.trim().toUpperCase() + ')', amtText: '', amtStyle: { fontSize: '13px', color: 'color-mix(in srgb, var(--ink) 52.33%, var(--surface))' }, cancel: true, onCancel: () => { this.clearCodeCartItems(); this.setState({ codeApplied: false }); } });
+    if (!onsiteEnabled && voucherApplied) { const v = this.vouchers.find(x => x.id === this.state.selectedVoucher); if (v) discountSubLines.push({ label: '(' + v.couponTitle + ')', amtText: '', amtStyle: { fontSize: '13px', color: 'color-mix(in srgb, var(--ink) 52.33%, var(--surface))' } }); }
     const disabledRow = { ...pinkRow, opacity: 0.4, cursor: 'not-allowed' };
     const memberOffers = [
       { key: 'discount', label: discountLabel, showP: false, note: '', subLines: discountSubLines,
@@ -259,7 +259,7 @@ class MobilePaymentLogic extends DCLogic {
         onToggle: () => this.setState({ showCodeModal: true, discountTab: 'code' }) },
       ...(onlineEnabled ? [{ key: 'gift', label: '使用電子禮券', showP: false, note: '',
         amtText: giftSelSum > 0 ? '-' + giftSelSum : '0', amtStyle: amtStyle(giftSelSum),
-        subLines: giftVouchers.map(g => ({ label: g.label, amtText: '', amtStyle: { fontSize: '13px', color: '#9A9A9A' } })),
+        subLines: giftVouchers.map(g => ({ label: g.label, amtText: '', amtStyle: { fontSize: '13px', color: 'color-mix(in srgb, var(--ink) 52.33%, var(--surface))' } })),
         rowStyle: pinkRow,
         onToggle: () => this.setState({ showGiftModal: true }) },
       { key: 'points', label: '使用瘋點數折抵', showP: true, note: '(使用優惠券/電子禮券/點數折抵僅限線上支付)', subLines: [],
@@ -286,8 +286,8 @@ class MobilePaymentLogic extends DCLogic {
       options: it.options || [],
       checkStyle: {
         width: '22px', height: '22px', borderRadius: '6px', flexShrink: 0,
-        border: '1.5px solid ' + (it.selected ? '#DE052E' : '#DE052E'),
-        background: it.selected ? '#DE052E' : '#FFFFFF', padding: 0,
+        border: '1.5px solid ' + (it.selected ? 'var(--brand)' : 'var(--brand)'),
+        background: it.selected ? 'var(--brand)' : 'var(--surface)', padding: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
       },
       onToggle: () => this.setState(s => {
@@ -310,7 +310,7 @@ class MobilePaymentLogic extends DCLogic {
           showAdd: !campaignComplete,
           plusStyle: {
             minWidth: '104px', height: '34px', padding: '0 10px', border: 'none', borderRadius: '8px',
-            background: '#DE052E', color: '#FFFFFF',
+            background: 'var(--brand)', color: 'var(--surface)',
             fontFamily: 'inherit', fontSize: '14px', fontWeight: '500', lineHeight: '1', display: 'flex', alignItems: 'center',
             justifyContent: 'center', cursor: 'pointer',
           },
@@ -330,8 +330,8 @@ class MobilePaymentLogic extends DCLogic {
     const tabBtn = (active) => ({
       flex: 1, padding: '10px 0', border: 'none', background: 'none',
       fontFamily: 'inherit', fontSize: '16px', fontWeight: active ? '700' : '400',
-      color: active ? '#DE052E' : '#9A9A9A', cursor: 'pointer',
-      borderBottom: '2px solid ' + (active ? '#DE052E' : 'transparent'),
+      color: active ? 'var(--brand)' : 'color-mix(in srgb, var(--ink) 52.33%, var(--surface))', cursor: 'pointer',
+      borderBottom: '2px solid ' + (active ? 'var(--brand)' : 'transparent'),
     });
 
     // 瘋點數折抵 popup
@@ -342,15 +342,15 @@ class MobilePaymentLogic extends DCLogic {
     const ptsValid = ptsNum > 0 && !ptsError;
     const ptsInputStyle = {
       width: '110px', textAlign: 'right', fontFamily: 'inherit', fontSize: '20px',
-      fontWeight: '700', color: '#3E3E3E', padding: '10px 14px',
-      border: '1px solid ' + (ptsError ? '#DE3B05' : '#C8C9C9'),
-      borderRadius: '10px', outline: 'none', background: '#FFFFFF',
+      fontWeight: '700', color: 'var(--ink)', padding: '10px 14px',
+      border: '1px solid ' + (ptsError ? 'var(--error)' : 'var(--line)'),
+      borderRadius: '10px', outline: 'none', background: 'var(--surface)',
     };
 
     const payCardStyle = (selected) => ({
-      border: '1.5px solid ' + (selected ? '#DE052E' : '#E5E5E5'),
+      border: '1.5px solid ' + (selected ? 'var(--brand)' : 'color-mix(in srgb, var(--ink) 13.47%, var(--surface))'),
       borderRadius: '12px', padding: '14px 16px', display: 'flex',
-      alignItems: 'flex-start', gap: '12px', background: '#FFFFFF',
+      alignItems: 'flex-start', gap: '12px', background: 'var(--surface)',
       cursor: 'pointer', width: '100%', textAlign: 'left', fontFamily: 'inherit',
     });
     const mkPay = (m) => ({ ...m, note: m.note || '', hasIcons: !!m.hasIcons,
@@ -367,9 +367,9 @@ class MobilePaymentLogic extends DCLogic {
     const fv = this.state.fields;
     const inputStyle = (err) => ({
       width: '100%', boxSizing: 'border-box', fontFamily: 'inherit',
-      fontSize: '16px', color: '#3E3E3E', padding: '12px 16px',
-      border: '1px solid ' + (err ? '#DE3B05' : '#C8C9C9'),
-      borderRadius: '12px', outline: 'none', background: '#FFFFFF',
+      fontSize: '16px', color: 'var(--ink)', padding: '12px 16px',
+      border: '1px solid ' + (err ? 'var(--error)' : 'var(--line)'),
+      borderRadius: '12px', outline: 'none', background: 'var(--surface)',
     });
     const mkField = (key, placeholder, error) => ({
       value: fv[key], placeholder, error: error || '',
@@ -455,8 +455,8 @@ class MobilePaymentLogic extends DCLogic {
         width: '100%', marginTop: '20px', border: 'none', fontFamily: 'inherit',
         fontSize: '20px', fontWeight: '500', padding: '14px', borderRadius: '12px',
         cursor: ptsValid ? 'pointer' : 'not-allowed',
-        background: ptsValid ? '#DE052E' : '#F6F6F6',
-        color: ptsValid ? '#FFFFFF' : '#C8C9C9',
+        background: ptsValid ? 'var(--brand)' : 'var(--canvas)',
+        color: ptsValid ? 'var(--surface)' : 'var(--line)',
       },
       onPointsInput: (e) => this.setState({ pointsInput: e.target.value.replace(/[^0-9]/g, '') }),
       stopModal: (e) => e.stopPropagation(),
@@ -478,7 +478,7 @@ class MobilePaymentLogic extends DCLogic {
             name: o.name, priceText: this.specPriceLabel(o.add),
             isCheckbox: isMulti, isRadio: !isMulti, selected,
             soldOut: !!o.soldOut, showImage: !o.soldOut && !!o.img,
-            nameColor: o.soldOut ? '#C8C9C9' : '#3E3E3E',
+            nameColor: o.soldOut ? 'var(--line)' : 'var(--ink)',
             boxStyle: this.specBoxStyle(selected),
             ringStyle: this.specRadioRing(selected),
             dotStyle: this.specRadioDot(selected),
@@ -506,7 +506,7 @@ class MobilePaymentLogic extends DCLogic {
           const selCount = g.mode === 'multi' ? Object.keys(this.state.specSel[g.id] || {}).length : (this.state.specSel[g.id] ? 1 : 0);
           const limitHit = g.mode === 'multi' && selCount >= g.max;
           return { title: g.title, required: !!g.required, hint: g.hint,
-            hintColor: limitHit ? '#DE052E' : '#9A9A9A',
+            hintColor: limitHit ? 'var(--brand)' : 'color-mix(in srgb, var(--ink) 52.33%, var(--surface))',
             items: g.items.map(o => buildRow(g, o, false)) };
         });
         let unit = basePrice;
@@ -545,7 +545,7 @@ class MobilePaymentLogic extends DCLogic {
           specQtyPlus: () => this.setState(s => ({ specQty: Math.min(specItem && specItem.key === 'tofu-reward' ? 1 : maxSpecQty, s.specQty + 1) })),
           specQtyPlusStyle: {
             width: '34px', height: '34px', borderRadius: '50%', border: 'none',
-            background: specItem && specItem.key === 'tofu-reward' ? '#C8C9C9' : '#DE052E', color: '#FFFFFF',
+            background: specItem && specItem.key === 'tofu-reward' ? 'var(--line)' : 'var(--brand)', color: 'var(--surface)',
             fontSize: '22px', lineHeight: '1', cursor: specItem && specItem.key === 'tofu-reward' ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           },
@@ -554,7 +554,7 @@ class MobilePaymentLogic extends DCLogic {
           specAddBtnStyle: {
             border: 'none', fontFamily: 'inherit', fontSize: '17px', fontWeight: '500',
             padding: '12px 24px', borderRadius: '12px', flexShrink: 0, cursor: canAdd ? 'pointer' : 'not-allowed',
-            background: canAdd ? '#DE052E' : '#F0F0F0', color: canAdd ? '#FFFFFF' : '#C8C9C9',
+            background: canAdd ? 'var(--brand)' : 'color-mix(in srgb, var(--ink) 7.77%, var(--surface))', color: canAdd ? 'var(--surface)' : 'var(--line)',
           },
           confirmSpec: () => {
             if (!canAdd || !specItem) return;
@@ -627,14 +627,14 @@ class MobilePaymentLogic extends DCLogic {
       campaignRewardArrowIcon: this.state.campaignRewardOpen ? 'assets/icons/Icon_dropdown-up.svg' : 'assets/icons/Icon_dropdown-down.svg',
       campaignNotesArrowIcon: this.state.campaignNotesOpen ? 'assets/icons/Icon_dropdown-up.svg' : 'assets/icons/Icon_dropdown-down.svg',
       campaignRewardOpacity: campaignComplete ? 1 : 0.4,
-      campaignProgressStyle: { height: '100%', width: Math.min(100, campaignSpend / 500 * 100) + '%', borderRadius: '99px', background: '#DE052E' },
+      campaignProgressStyle: { height: '100%', width: Math.min(100, campaignSpend / 500 * 100) + '%', borderRadius: '99px', background: 'var(--brand)' },
       toggleCampaignProducts: () => this.setState(s => ({ campaignProductsOpen: !s.campaignProductsOpen })),
       toggleCampaignReward: () => this.setState(s => ({ campaignRewardOpen: !s.campaignRewardOpen })),
       toggleCampaignNotes: () => this.setState(s => ({ campaignNotesOpen: !s.campaignNotesOpen })),
       showCampaignRewardAdd: !campaignRewardAdded,
       campaignRewardAddStyle: {
         minWidth: '104px', height: '34px', padding: '0 10px', border: 'none', borderRadius: '8px',
-        background: campaignComplete ? '#DE052E' : '#F0F0F0', color: campaignComplete ? '#FFFFFF' : '#C8C9C9',
+        background: campaignComplete ? 'var(--brand)' : 'color-mix(in srgb, var(--ink) 7.77%, var(--surface))', color: campaignComplete ? 'var(--surface)' : 'var(--line)',
         fontFamily: 'inherit', fontSize: '14px', fontWeight: '500', lineHeight: '1', display: 'flex', alignItems: 'center',
         justifyContent: 'center', cursor: campaignComplete ? 'pointer' : 'not-allowed',
       },
@@ -661,15 +661,15 @@ class MobilePaymentLogic extends DCLogic {
       continueCodeOrder: () => this.setState({ showCodeLeaveModal: false }),
       codeInputStyle: {
         width: '100%', boxSizing: 'border-box', fontFamily: 'inherit', fontSize: '16px',
-        color: '#3E3E3E', padding: '14px 16px', border: '1px solid #C8C9C9',
-        borderRadius: '12px', outline: 'none', background: '#FFFFFF',
+        color: 'var(--ink)', padding: '14px 16px', border: '1px solid var(--line)',
+        borderRadius: '12px', outline: 'none', background: 'var(--surface)',
       },
       codeConfirmStyle: {
         border: 'none', fontFamily: 'inherit', fontSize: '20px', fontWeight: '500',
         padding: '12px 36px', borderRadius: '12px',
         cursor: discountConfirmValid ? 'pointer' : 'not-allowed',
-        background: discountConfirmValid ? '#DE052E' : '#F6F6F6',
-        color: discountConfirmValid ? '#FFFFFF' : '#C8C9C9',
+        background: discountConfirmValid ? 'var(--brand)' : 'var(--canvas)',
+        color: discountConfirmValid ? 'var(--surface)' : 'var(--line)',
       },
       confirmCode: () => {
         if (!discountConfirmValid) return;
@@ -679,11 +679,11 @@ class MobilePaymentLogic extends DCLogic {
       voucherRows: this.vouchers.map(v => {
         const expired = !!v.expired;
         const sel = this.state.selectedVoucher === v.id && !expired;
-        const valueBg = expired ? '#DADADA' : '#FFEED8';
-        const valueColor = expired ? '#FFFFFF' : '#DE052E';
-        const titleColor = expired ? '#C2C2C2' : '#3E3E3E';
-        const metaColor = expired ? '#CFCFCF' : '#8A8A8A';
-        const tagColor = expired ? '#CFCFCF' : '#F0A73E';
+        const valueBg = expired ? 'color-mix(in srgb, var(--ink) 19.17%, var(--surface))' : 'var(--accent-soft)';
+        const valueColor = expired ? 'var(--surface)' : 'var(--brand)';
+        const titleColor = expired ? 'color-mix(in srgb, var(--ink) 31.61%, var(--surface))' : 'var(--ink)';
+        const metaColor = expired ? 'color-mix(in srgb, var(--ink) 24.87%, var(--surface))' : 'color-mix(in srgb, var(--ink) 60.62%, var(--surface))';
+        const tagColor = expired ? 'color-mix(in srgb, var(--ink) 24.87%, var(--surface))' : 'var(--accent-dark)';
         return {
           id: v.id, denomTop: v.denomTop, denomBig: v.denomBig, denomBottom: v.denomBottom, couponTitle: v.couponTitle,
           couponPeriod: v.couponPeriod, couponTimes: v.couponTimes, couponTags: v.couponTags,
@@ -691,8 +691,8 @@ class MobilePaymentLogic extends DCLogic {
           cardStyle: {
             position: 'relative', display: 'flex', gap: '14px', padding: '0',
             borderRadius: '14px', overflow: 'hidden', boxSizing: 'border-box',
-            border: '2px solid ' + (sel ? '#DE052E' : (expired ? '#DADADA' : '#FFEED8')),
-            background: '#FFFFFF', width: '100%', textAlign: 'left', fontFamily: 'inherit',
+            border: '2px solid ' + (sel ? 'var(--brand)' : (expired ? 'color-mix(in srgb, var(--ink) 19.17%, var(--surface))' : 'var(--accent-soft)')),
+            background: 'var(--surface)', width: '100%', textAlign: 'left', fontFamily: 'inherit',
             cursor: expired ? 'not-allowed' : 'pointer', minHeight: '96px',
           },
           valueBlockStyle: {
@@ -716,8 +716,8 @@ class MobilePaymentLogic extends DCLogic {
           cardStyle: {
             position: 'relative', overflow: 'hidden', flexShrink: 0,
             display: 'flex', gap: '12px', padding: '12px', borderRadius: '12px',
-            border: '2px solid ' + (sel ? '#DE052E' : '#F6F6F6'),
-            background: '#FFFFFF', cursor: 'pointer', textAlign: 'left', width: '100%',
+            border: '2px solid ' + (sel ? 'var(--brand)' : 'var(--canvas)'),
+            background: 'var(--surface)', cursor: 'pointer', textAlign: 'left', width: '100%',
             fontFamily: 'inherit',
           },
           onSelect: () => this.setState(s => {
@@ -732,8 +732,8 @@ class MobilePaymentLogic extends DCLogic {
           border: 'none', fontFamily: 'inherit', fontSize: '20px', fontWeight: '500',
           padding: '14px', borderRadius: '12px', width: '100%',
           cursor: 'pointer',
-          background: '#DE052E',
-          color: '#FFFFFF',
+          background: 'var(--brand)',
+          color: 'var(--surface)',
         };
       })(),
       closeGiftModal: () => this.setState({ showGiftModal: false }),

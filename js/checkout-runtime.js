@@ -95,7 +95,7 @@
     html.sc-dc-streaming .sc-placeholder::before,
     html.sc-dc-streaming .sc-interp.sc-missing::before{content:'';
       position:absolute;inset:0;pointer-events:none;
-      background:linear-gradient(90deg,rgba(217,119,87,0) 25%,rgba(247,225,211,.95) 37%,rgba(217,119,87,0) 63%);
+      background:linear-gradient(90deg,transparent 25%,color-mix(in srgb, var(--runtime-shimmer) 95%, transparent) 37%,transparent 63%);
       background-size:400% 100%;animation:sc-shine 1.4s ease infinite}
     html.sc-dc-streaming .sc-placeholder:nth-child(n+9 of .sc-placeholder)::before,
     html.sc-dc-streaming .sc-interp.sc-missing:nth-child(n+9 of .sc-interp.sc-missing)::before{animation:none;
@@ -103,7 +103,7 @@
     .sc-placeholder-error{padding:4px 8px;font:11px/1.4 ui-monospace,monospace;
       color:color-mix(in srgb,currentColor 70%,transparent);word-break:break-word}
     .sc-interp.sc-missing{display:inline-block;width:2em;height:1em;overflow:hidden;
-      vertical-align:text-bottom;background:rgba(255,255,255,.3);border:1px solid rgba(0,0,0,.5);
+      vertical-align:text-bottom;background:color-mix(in srgb, var(--surface) 30%, transparent);border:1px solid color-mix(in srgb, var(--black) 50%, transparent);
       border-radius:2px;box-sizing:border-box;color:transparent;
       user-select:none}
     .sc-interp.sc-unresolved{font-family:ui-monospace,monospace;font-size:.85em;
@@ -112,7 +112,7 @@
       padding:0 3px}
     .sc-host.sc-has-error{position:relative}
     .sc-logic-error{position:absolute;top:8px;left:8px;z-index:2147483647;max-width:60ch;
-      padding:6px 10px;background:#b00020;color:#fff;font:12px/1.4 ui-monospace,monospace;
+      padding:6px 10px;background:var(--runtime-error);color:var(--surface);font:12px/1.4 ui-monospace,monospace;
       border-radius:4px;white-space:pre-wrap;pointer-events:none}
     /* Mirrors PRINT_BASELINE_CSS in apps/web deck-stage-export.ts \u2014 keep both
        in sync until dc-runtime regains a build step. */
@@ -1235,8 +1235,8 @@
 
   // src/helmet.ts
   var DESIGN_DOC_MODE_RE = /<meta\b[^>]*\bname\s*=\s*["']design_doc_mode["'][^>]*\b(?:content|value)\s*=\s*["'](\w+)["']/i;
-  var CANVAS_BG_LIGHT = "#f0eee6";
-  var CANVAS_BG_DARK = "#2e2c26";
+  var CANVAS_BG_LIGHT = "var(--runtime-canvas-light)";
+  var CANVAS_BG_DARK = "var(--runtime-canvas-dark)";
   function createHelmetManager(doc, isStreaming) {
     const mounted = /* @__PURE__ */ new Set();
     const live = /* @__PURE__ */ new Map();
