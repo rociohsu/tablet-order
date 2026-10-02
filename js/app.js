@@ -141,7 +141,7 @@ function setupSwipe() {
   });
 }
 
-function renderVerification(onVerified = renderZones) {
+function renderVerification(onVerified = renderZones, purpose = "配桌") {
   window.clearInterval(carouselTimer);
   const overlay = document.createElement("div");
   overlay.className = "overlay";
@@ -149,8 +149,8 @@ function renderVerification(onVerified = renderZones) {
     <form class="verify-card" id="verify-form">
       <h2>通行碼驗證</h2>
       <p>請輸入通行碼</p>
-      ${codeField("配桌通行碼")}
-      <p class="hint" id="verify-hint">驗證通過後即可選擇用餐區域與桌位</p>
+      ${codeField(`${purpose}通行碼`)}
+      <p class="hint" id="verify-hint">${purpose === "開桌" ? "驗證通過後即可進行開桌" : "驗證通過後即可選擇用餐區域與桌位"}</p>
       <div class="verify-actions"><button class="secondary-button" type="button" id="cancel-verify">取消</button><button class="primary-button" type="submit">驗證</button></div>
     </form>`;
   document.querySelector("#app").appendChild(overlay);
@@ -222,7 +222,7 @@ function renderAssigned(table, opened = false) {
   document.querySelector("#reassign-table").addEventListener("click", () => renderVerification(() => renderManagement(table)));
   document.querySelector("#start-order").addEventListener("click", () => {
     if (opened) window.location.href = "menu.html";
-    else renderOpenTableStep(table, 1);
+    else renderVerification(() => renderOpenTableStep(table, 1), "開桌");
   });
   document.querySelector("#service-bell").onclick = renderServiceMenu;
   setupSwipe();
@@ -245,7 +245,7 @@ function renderManagement(table) {
       <button class="management-action" id="management-open" type="button"><img src="assets/icons/open-table.svg" alt="" aria-hidden="true" /><span>開桌</span></button>
     </section>`;
   document.querySelector("#management-reassign").addEventListener("click", renderZones);
-  document.querySelector("#management-open").addEventListener("click", () => renderOpenTableStep(table, 1));
+  document.querySelector("#management-open").addEventListener("click", () => renderVerification(() => renderOpenTableStep(table, 1), "開桌"));
 }
 
 function renderOpenTableStep(table, step, data = {}) {

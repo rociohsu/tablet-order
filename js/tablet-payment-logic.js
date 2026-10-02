@@ -506,7 +506,7 @@ class MobilePaymentLogic extends DCLogic {
           const selCount = g.mode === 'multi' ? Object.keys(this.state.specSel[g.id] || {}).length : (this.state.specSel[g.id] ? 1 : 0);
           const limitHit = g.mode === 'multi' && selCount >= g.max;
           return { title: g.title, required: !!g.required, hint: g.hint,
-            hintColor: limitHit ? 'var(--brand)' : 'color-mix(in srgb, var(--ink) 52.33%, var(--surface))',
+            hintColor: limitHit ? 'var(--notice)' : 'color-mix(in srgb, var(--ink) 52.33%, var(--surface))',
             items: g.items.map(o => buildRow(g, o, false)) };
         });
         let unit = basePrice;
@@ -627,7 +627,7 @@ class MobilePaymentLogic extends DCLogic {
       campaignRewardArrowIcon: this.state.campaignRewardOpen ? 'assets/icons/Icon_dropdown-up.svg' : 'assets/icons/Icon_dropdown-down.svg',
       campaignNotesArrowIcon: this.state.campaignNotesOpen ? 'assets/icons/Icon_dropdown-up.svg' : 'assets/icons/Icon_dropdown-down.svg',
       campaignRewardOpacity: campaignComplete ? 1 : 0.4,
-      campaignProgressStyle: { height: '100%', width: Math.min(100, campaignSpend / 500 * 100) + '%', borderRadius: '99px', background: 'var(--brand)' },
+      campaignProgressStyle: { height: '100%', width: Math.min(100, campaignSpend / 500 * 100) + '%', borderRadius: '99px', background: 'var(--notice)' },
       toggleCampaignProducts: () => this.setState(s => ({ campaignProductsOpen: !s.campaignProductsOpen })),
       toggleCampaignReward: () => this.setState(s => ({ campaignRewardOpen: !s.campaignRewardOpen })),
       toggleCampaignNotes: () => this.setState(s => ({ campaignNotesOpen: !s.campaignNotesOpen })),
@@ -679,11 +679,11 @@ class MobilePaymentLogic extends DCLogic {
       voucherRows: this.vouchers.map(v => {
         const expired = !!v.expired;
         const sel = this.state.selectedVoucher === v.id && !expired;
-        const valueBg = expired ? 'color-mix(in srgb, var(--ink) 19.17%, var(--surface))' : 'var(--accent-soft)';
-        const valueColor = expired ? 'var(--surface)' : 'var(--brand)';
+        const valueBg = expired ? 'color-mix(in srgb, var(--ink) 19.17%, var(--surface))' : 'var(--accent)';
+        const valueColor = 'var(--surface)';
         const titleColor = expired ? 'color-mix(in srgb, var(--ink) 31.61%, var(--surface))' : 'var(--ink)';
         const metaColor = expired ? 'color-mix(in srgb, var(--ink) 24.87%, var(--surface))' : 'color-mix(in srgb, var(--ink) 60.62%, var(--surface))';
-        const tagColor = expired ? 'color-mix(in srgb, var(--ink) 24.87%, var(--surface))' : 'var(--accent-dark)';
+        const tagColor = expired ? 'color-mix(in srgb, var(--ink) 24.87%, var(--surface))' : 'var(--accent)';
         return {
           id: v.id, denomTop: v.denomTop, denomBig: v.denomBig, denomBottom: v.denomBottom, couponTitle: v.couponTitle,
           couponPeriod: v.couponPeriod, couponTimes: v.couponTimes, couponTags: v.couponTags,
@@ -691,7 +691,7 @@ class MobilePaymentLogic extends DCLogic {
           cardStyle: {
             position: 'relative', display: 'flex', gap: '14px', padding: '0',
             borderRadius: '14px', overflow: 'hidden', boxSizing: 'border-box',
-            border: '2px solid ' + (sel ? 'var(--brand)' : (expired ? 'color-mix(in srgb, var(--ink) 19.17%, var(--surface))' : 'var(--accent-soft)')),
+            border: '2px solid ' + (sel ? 'var(--brand)' : (expired ? 'color-mix(in srgb, var(--ink) 19.17%, var(--surface))' : 'var(--accent)')),
             background: 'var(--surface)', width: '100%', textAlign: 'left', fontFamily: 'inherit',
             cursor: expired ? 'not-allowed' : 'pointer', minHeight: '96px',
           },

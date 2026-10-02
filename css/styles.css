@@ -1,5 +1,12 @@
+/* Temporarily hide language selection across all pages. */
+#language-button,
+#language-dialog {
+  display: none;
+}
+
 :root {
-  --brand: #de052e;
+  --brand: #231815;
+  --brand-II: #bc9e4e;
   --brand-dark: color-mix(in srgb, var(--brand) 83%, var(--black));
   --ink: #3e3e3e;
   --muted: #5b5b5b;
@@ -12,10 +19,9 @@
   --bar-height: calc(76px + env(safe-area-inset-top, 0px));
   /* Independent semantic colors; neutral shades below derive from the base palette. */
   --black: #000000;
-  --error: #de3b05;
-  --accent: #fcae42;
-  --accent-dark: #f0a73e;
-  --accent-soft: #ffeed8;
+  --error: #b00020;
+  --notice: #b00020;
+  --accent: #bc9e4e;
   --surface-warm: #faf8f6;
   /* Checkout runtime diagnostics and design preview. */
   --runtime-error: #b00020;

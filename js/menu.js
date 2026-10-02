@@ -291,10 +291,11 @@ function orderPreferences(line) {
     ].filter(Boolean);
 }
 function renderCart() {
+  $('.cart-note').hidden = cart.length === 0;
   $('#cart-items').innerHTML = cart.length ? cart.map((line, index) => {
     const preferences = orderPreferences(line);
     return `<article class="cart-item" data-cart-index="${index}"><div class="cart-item-copy"><h3>${escapeCartText(line.name)}</h3>${preferences.length ? `<p>${preferences.map(escapeCartText).join('<br>')}</p>` : ''}</div><div class="cart-item-controls"><div class="cart-quantity"><button data-cart-action="minus" aria-label="減少${escapeCartText(line.name)}數量" ${line.qty <= 1 ? 'disabled' : ''}>−</button><output aria-label="${escapeCartText(line.name)}數量">${line.qty}</output><button data-cart-action="plus" aria-label="增加${escapeCartText(line.name)}數量" ${canIncreaseCartLine(line) ? '' : 'disabled'}>＋</button></div><strong class="cart-item-price">${money(line.unit * line.qty)}</strong><button class="cart-delete" data-cart-action="delete" aria-label="刪除${escapeCartText(line.name)}"><img src="assets/icons/Icon_delete.svg" alt=""></button></div></article>`;
-  }).join('') : '<div class="cart-empty"><img src="assets/icons/Icon_order.svg" alt=""><h3>購物車尚無餐點</h3></div>';
+  }).join('') : '<div class="cart-empty"><svg class="cart-empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.8"></rect><path d="M8 3V2M16 3V2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path><path d="M8 9H16M8 13H16M8 17H13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg><h3>購物車尚無餐點</h3></div>';
   $('#cart-total').textContent = `共${cart.reduce((sum, line) => sum + line.qty, 0)}份・${money(cart.reduce((sum, line) => sum + line.unit * line.qty, 0))}`;
   $('#clear-cart').disabled = $('#cart-checkout').disabled = cart.length === 0;
 }
@@ -395,3 +396,11 @@ $('#custom-flavor').onclick = () => {
   $('#meal-note').hidden = !selected;
   if (selected) $('#meal-note').focus();
 };
+
+const lastOrderDialog = $('#last-order-dialog');
+$('#close-last-order').onclick = () => lastOrderDialog.close();
+lastOrderDialog.addEventListener('click', event => {
+  const rect = lastOrderDialog.getBoundingClientRect();
+  if (event.target === lastOrderDialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) lastOrderDialog.close();
+});
+lastOrderDialog.showModal();
