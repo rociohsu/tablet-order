@@ -3,7 +3,7 @@ window.createTabletPaymentLogic = function(DCLogic) {
 class MobilePaymentLogic extends DCLogic {
   state = {
     itemsOpen: true, orderOpen: true, menuOpen: false, pay: 'onsite', invoice: 'mobile',
-    showPaymentInfoModal: true, onlinePaymentAvailable: true, memberNickname: '阿薰(Carol)', memberPhone: '0900000000',
+    showPaymentInfoModal: true, onlinePaymentAvailable: true, memberNickname: 'Anna', memberPhone: '0900000000',
     fields: { mobile: '', citizen: '', companyId: '', companyTitle: '', donate: '' },
     loggedIn: (() => { try { return localStorage.getItem('funMember') === '1'; } catch (e) { return false; } })(), lineLoggedIn: (() => { try { return localStorage.getItem('lineMember') === '1'; } catch (e) { return false; } })(), usePoints: false, codeApplied: false, voucherApplied: false,
     showPointsModal: false, pointsInput: '', pointsApplied: 0,
@@ -803,7 +803,7 @@ return class TabletPaymentLogic extends MobilePaymentLogic {
       if(top) {
         const dialog=top.querySelector('[role="dialog"]');
         const title=dialog?.querySelector('span,div');
-        if(dialog && !dialog.hasAttribute('aria-label')) dialog.setAttribute('aria-label',title?.textContent.trim() || '結帳選項');
+        if(dialog && !dialog.hasAttribute('aria-label') && !dialog.hasAttribute('aria-labelledby')) dialog.setAttribute('aria-label',title?.textContent.trim() || '結帳選項');
         (dialog?.querySelector('button,input') || dialog)?.focus({preventScroll:true});
         top.onkeydown=event=>{
           if(event.key !== 'Tab') return;

@@ -32,4 +32,16 @@
 .mobile-payment-content button,.mobile-payment-modals button{line-height:1.45}
 @media(max-width:1050px){.mobile-payment-content>div{padding:20px!important}.mobile-payment-content{gap:18px}}
 
-.mobile-payment-modals .sheet-modal.checkout-discount-modal{width:var(--product-dialog-width)!important;max-width:none!important;height:var(--product-dialog-height)!important;max-height:var(--product-dialog-height)!important;border-radius:20px!important}
+.mobile-payment-modals .checkout-benefit-modal{position:relative;display:flex;flex-direction:column;width:min(560px,100%);max-height:calc(100dvh - 48px);padding:32px;border-radius:20px;background:var(--surface);color:var(--ink);font:inherit;box-shadow:var(--shadow);overflow:hidden}
+.mobile-payment-modals .checkout-modal-backdrop:has(.checkout-benefit-modal){background:color-mix(in srgb, var(--black) 42%, transparent)!important}
+.checkout-benefit-header{flex-shrink:0}
+.checkout-benefit-header h2{font-size:30px;font-weight:700;line-height:1.5;margin:0 40px 24px 0}
+.mobile-payment-modals .checkout-benefit-modal .close-button{min-height:0;width:44px;height:44px}
+.checkout-benefit-body{min-height:0;overflow-y:auto;flex:0 1 auto}
+.points-modal-icon{display:block;width:20px;height:20px;object-fit:contain;flex-shrink:0}
+.mobile-payment-modals .checkout-points-modal{width:min(400px,100%)}
+.points-use-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px;width:100%}
+.points-use-row>label{flex-shrink:0}
+.points-use-field{display:flex;align-items:center;gap:12px;flex:1;min-width:0;max-width:212px}
+.points-use-field input{width:100%;min-width:0;flex:1}
+@media(max-width:600px){.mobile-payment-modals .checkout-benefit-modal{padding:28px 20px}}

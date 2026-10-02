@@ -334,17 +334,52 @@ button:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 28%, t
   .tables { grid-template-columns: repeat(3, 1fr); }
 }
 
+/* Keep every button and its visual contents free of shadows in all states. */
+button,
+button *,
+[role="button"],
+[role="button"] *,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
 /* Shared brand focus treatment for all form fields. */
 input:focus, textarea:focus, select:focus, [contenteditable="true"]:focus {
-  border-color: var(--brand);
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
+  border-color: var(--brand) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Match the service popup interaction states, including inline checkout controls. */
+button:focus-visible {
+  outline: none !important;
+  border-color: var(--brand) !important;
+  box-shadow: none !important;
+}
+button:not(:disabled):active {
+  transform: scale(.98);
+}
+button:disabled:active {
+  transform: none;
+}
+.service-option.selected,
+.table-button.selected,
+.plan-button.selected,
+.flavor-option[aria-pressed="true"],
+.combo-preferences button[aria-pressed="true"],
+.combo-preferences button[aria-expanded="true"] {
+  border: 2px solid var(--brand) !important;
+  color: var(--brand) !important;
+  background: var(--surface) !important;
 }
 
 /* Shared focus appearance for popup close buttons on both tablet pages. */
 button.close-button:focus, button.close-button:focus-visible,
 button.service-menu-close:focus, button.service-menu-close:focus-visible {
-  outline: none;
-  box-shadow: none;
-  border: 0;
+  outline: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
 }
