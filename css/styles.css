@@ -19,12 +19,12 @@
   --bar-height: calc(76px + env(safe-area-inset-top, 0px));
   /* Independent semantic colors; neutral shades below derive from the base palette. */
   --black: #000000;
-  --error: #b00020;
-  --notice: #b00020;
+  --error: #de052e;
+  --notice: #de052e;
   --accent: #bc9e4e;
   --surface-warm: #faf8f6;
   /* Checkout runtime diagnostics and design preview. */
-  --runtime-error: #b00020;
+  --runtime-error: #de052e;
   --runtime-canvas-light: #f0eee6;
   --runtime-canvas-dark: #2e2c26;
   --runtime-shimmer: #f7e1d3;

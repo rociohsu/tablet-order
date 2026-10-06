@@ -353,7 +353,7 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
 .member-benefits{list-style:none;padding:0;margin:0;display:grid;gap:26px;color:color-mix(in srgb, var(--ink) 27.42%, var(--black))}
 .member-benefits li{display:flex;align-items:center;gap:20px;min-height:40px;font-size:24px}
 .member-benefits img{width:38px;height:38px;object-fit:contain;flex-shrink:0}
-.member-benefits strong{color:var(--brand);font-weight:700}
+.member-benefits strong{color:var(--notice);font-weight:700}
 .member-login,.member-logout{display:flex;align-items:center;justify-content:center;min-height:64px;border:1px solid var(--line);background:var(--surface);color:color-mix(in srgb, var(--ink) 27.42%, var(--black));font-size:24px;font-weight:400}
 .member-login{width:min(450px,100%);margin:0 auto;gap:12px;border-radius:16px}
 .member-login img{width:36px;height:36px}
