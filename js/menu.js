@@ -26,7 +26,11 @@ menu.forEach(category => category.items.forEach(item => { item.image = 'assets/m
 menu[0].items[0].image = null;
 menu[0].items.push(
   { name: '麻辣臭臭鍋', desc: '道地川味麻辣湯底，附鴨血豆腐', price: 260, image: 'assets/menu.jpg', limit: 3, limitLabel: '/1人', limitReached: true },
-  { name: '海鮮總匯鍋', desc: '蝦、蛤蜊、魚片一次滿足', price: 320, image: 'assets/menu.jpg', limit: 3, limitLabel: '/1人', soldOut: true }
+  { name: '海鮮總匯鍋', desc: '蝦、蛤蜊、魚片一次滿足', price: 320, image: 'assets/menu.jpg', limit: 3, limitLabel: '/1人', soldOut: true },
+  { name: '養生蔬食套餐', desc: '清爽蔬果湯底搭配季節蔬菜與副餐', price: 280, image: null, limit: 3, limitLabel: '/1人' },
+  { name: '經典豬肉鍋套餐', desc: '精選豬肉搭配昆布湯底、蔬菜盤與副餐', price: 320, image: 'assets/menu.jpg', limit: 3, limitLabel: '/1人' },
+  { name: '香濃牛奶雞肉套餐', desc: '香濃牛奶湯底搭配嫩雞肉、蔬菜盤與副餐', price: 350, image: 'assets/menu.jpg', limit: 3, limitLabel: '/1人', limitReached: true },
+  { name: '鮮蝦海陸套餐', desc: '鮮蝦與肉品雙重搭配，附季節蔬菜盤與副餐', price: 420, image: 'assets/menu.jpg', limit: 3, limitLabel: '/1人', soldOut: true }
 );
 const optionGroups = window.TabletProductOptions;
 // Product behavior is explicit and independent of its menu category.
