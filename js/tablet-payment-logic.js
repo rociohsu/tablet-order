@@ -784,7 +784,18 @@ return class TabletPaymentLogic extends MobilePaymentLogic {
   }
   componentDidUpdate() { this.syncTablet(); }
   componentWillUnmount() { document.removeEventListener('tablet-member-change',this.onMemberChange); }
+  lockForOnsitePayment() {
+    if(this.state.pay !== 'onsite') return;
+    const dialog=document.querySelector('#onsite-payment-lock');
+    if(!dialog || dialog.open) return;
+    dialog.oncancel=event=>event.preventDefault();
+    dialog.onkeydown=event=>{if(event.key==='Escape' || event.key==='Tab') event.preventDefault();};
+    dialog.showModal();
+    dialog.focus({preventScroll:true});
+  }
   syncTablet() {
+    const payButton=document.querySelector('#pay-button');
+    if(payButton) payButton.onclick=()=>this.lockForOnsitePayment();
     if(this.state.loggedIn) window.TabletMemberProfile = {name:this.state.memberNickname,phone:this.state.memberPhone};
     if(this.lastMember !== this.state.loggedIn) {
       this.lastMember = this.state.loggedIn;
@@ -828,8 +839,8 @@ return class TabletPaymentLogic extends MobilePaymentLogic {
     for(const name of ['Products','Reward','Notes']) vals[`campaign${name}ArrowStyle`]={transform:this.state[`campaign${name}Open`] ? 'rotate(180deg)' : 'none'};
     const login=vals.onLogin;
     vals.onLogin=()=>{login();this.setState({memberNickname:window.TabletMemberProfile.name,memberPhone:window.TabletMemberProfile.phone});};
-    // Payment submission remains an inert prototype action as requested.
-    vals.goPay=()=>{};
+    // Onsite checkout locks the tablet while payment is handled at the counter.
+    vals.goPay=()=>this.lockForOnsitePayment();
     // Dynamic style objects use the same readable tablet type scale as the template.
     const scale=value=>{
       if(Array.isArray(value)) return value.map(scale);

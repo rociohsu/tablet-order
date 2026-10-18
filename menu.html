@@ -54,6 +54,12 @@
 <footer class="cart-footer"><div class="cart-total"><strong id="cart-total" aria-live="polite"></strong><small>服務費另計</small></div><button id="cart-checkout" aria-haspopup="dialog">送出訂單</button></footer>
 </section>
 </dialog>
+<dialog id="order-interval-dialog" aria-labelledby="order-interval-title" aria-describedby="order-interval-message">
+<button class="close-button" id="close-order-interval" aria-label="關閉送單間隔提示"><img src="assets/icons/Icon_close.svg" alt=""></button>
+<h2 id="order-interval-title">請稍候再試</h2>
+<p id="order-interval-message">本次點餐尚未達 5 分鐘間隔時間</p>
+<button id="defer-order" class="service-confirm" autofocus>稍後送單</button>
+</dialog>
 <dialog id="submit-order-dialog" aria-labelledby="submit-order-title">
 <h2 id="submit-order-title">送出訂單後無法修改</h2>
 <div class="submit-order-actions"><button id="continue-ordering" autofocus>繼續點餐</button><button id="confirm-order">確認送出</button></div>

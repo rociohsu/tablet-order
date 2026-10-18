@@ -158,7 +158,8 @@ function updateTotal() {
   const { unit, missing } = summary();
   $('#quantity').textContent = quantity;
   $('#minus').disabled = quantity <= 1;
-  $('#plus').disabled = quantity >= remaining(current.ci, current.ii);
+  $('#plus').disabled = false;
+  $('#plus').classList.toggle('at-limit', quantity >= remaining(current.ci, current.ii));
   $('#add-cart').disabled = missing.length > 0 || !!productState(current.ci, current.ii) || quantity > remaining(current.ci, current.ii);
   $('#add-cart').textContent = `加入購物車・${money(unit * quantity)}`;
   $('#validation').textContent = missing.length ? `尚須選擇：${missing.map(g => g.title).join('、')}` : '已完成選擇';
@@ -222,7 +223,12 @@ $('#option-groups').addEventListener('click', event => {
   values[button.dataset.option] = Math.max(1, Math.min(99, values[button.dataset.option] + Number(button.dataset.delta))); renderOptions();
 });
 $('#minus').onclick = () => { quantity = Math.max(1, quantity - 1); updateTotal(); };
-$('#plus').onclick = () => { quantity = Math.min(remaining(current.ci, current.ii), quantity + 1); updateTotal(); };
+$('#plus').onclick = () => {
+  if (quantity >= remaining(current.ci, current.ii)) { notify('已達本次點餐份數上限'); return; }
+  quantity += 1;
+  updateTotal();
+  if (quantity === remaining(current.ci, current.ii)) notify('已達本次點餐份數上限');
+};
 $('#close-detail').onclick = () => detail.close();
 $('#add-cart').onclick = () => {
   const { unit, missing } = summary(); if (missing.length || productState(current.ci, current.ii) || quantity > remaining(current.ci, current.ii)) return;
@@ -282,6 +288,8 @@ function renderOrderStatus() {
   $('#view-cart').disabled = count === 0;
 }
 const cartDialog = $('#cart-dialog');
+const orderIntervalDialog = $('#order-interval-dialog');
+let orderIntervalPending = false;
 $('#order-note').value = savedOrderNote;
 const escapeCartText = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 function canIncreaseCartLine(line) {
@@ -301,13 +309,31 @@ function renderCart() {
     return `<article class="cart-item" data-cart-index="${index}"><div class="cart-item-copy"><h3>${escapeCartText(line.name)}</h3>${preferences.length ? `<p>${preferences.map(escapeCartText).join('<br>')}</p>` : ''}</div><div class="cart-item-controls"><div class="cart-quantity"><button data-cart-action="minus" aria-label="減少${escapeCartText(line.name)}數量" ${line.qty <= 1 ? 'disabled' : ''}>−</button><output aria-label="${escapeCartText(line.name)}數量">${line.qty}</output><button data-cart-action="plus" aria-label="增加${escapeCartText(line.name)}數量" ${canIncreaseCartLine(line) ? '' : 'disabled'}>＋</button></div><strong class="cart-item-price">${money(line.unit * line.qty)}</strong><button class="cart-delete" data-cart-action="delete" aria-label="刪除${escapeCartText(line.name)}"><img src="assets/icons/Icon_delete.svg" alt=""></button></div></article>`;
   }).join('') : '<div class="cart-empty"><svg class="cart-empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.8"></rect><path d="M8 3V2M16 3V2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path><path d="M8 9H16M8 13H16M8 17H13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg><h3>購物車尚無餐點</h3></div>';
   $('#cart-total').textContent = `共${cart.reduce((sum, line) => sum + line.qty, 0)}份・${money(cart.reduce((sum, line) => sum + line.unit * line.qty, 0))}`;
-  $('#clear-cart').disabled = $('#cart-checkout').disabled = cart.length === 0;
+  $('#clear-cart').disabled = cart.length === 0;
+  $('#cart-checkout').disabled = orderIntervalPending || cart.length === 0;
 }
 function saveCartChanges() {
   try { persistOrderState(); } catch { notify('瀏覽器無法儲存，重新整理將遺失變更'); }
   renderCart(); renderCategory(activeCategory); renderOrderStatus();
 }
-$('#view-cart').onclick = () => { renderCart(); cartDialog.showModal(); $('#close-cart').focus(); };
+$('#view-cart').onclick = () => {
+  orderIntervalPending = true;
+  renderCart();
+  cartDialog.showModal();
+  orderIntervalDialog.showModal();
+  $('#defer-order').focus();
+};
+const closeOrderInterval = () => orderIntervalDialog.close();
+$('#close-order-interval').onclick = closeOrderInterval;
+$('#defer-order').onclick = () => {
+  orderIntervalPending = false;
+  closeOrderInterval();
+};
+orderIntervalDialog.addEventListener('close', () => {
+  $('#cart-checkout').disabled = orderIntervalPending || cart.length === 0;
+  if (cartDialog.open) ($('#cart-checkout').disabled ? $('#close-cart') : $('#cart-checkout')).focus({preventScroll:true});
+});
+cartDialog.addEventListener('close', () => { if (orderIntervalDialog.open) orderIntervalDialog.close(); });
 $('#close-cart').onclick = () => cartDialog.close();
 cartDialog.addEventListener('click', event => { if (event.target === cartDialog) cartDialog.close(); });
 $('#cart-items').addEventListener('click', event => {
@@ -334,7 +360,7 @@ function saveOrderNote() {
 $('#order-note').addEventListener('input', saveOrderNote);
 const submitOrderDialog = $('#submit-order-dialog');
 $('#cart-checkout').onclick = () => {
-  if (!cart.length) return;
+  if (orderIntervalPending || !cart.length) return;
   saveOrderNote();
   submitOrderDialog.showModal();
 };

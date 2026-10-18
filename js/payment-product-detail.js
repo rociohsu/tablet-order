@@ -14,7 +14,8 @@
     const {unit,missing}=summary();
     $('#quantity').textContent=quantity;
     $('#minus').disabled=quantity<=1;
-    $('#plus').disabled=quantity>=item.maxQty;
+    $('#plus').disabled=false;
+    $('#plus').classList.toggle('at-limit',quantity>=item.maxQty);
     $('#add-cart').disabled=missing.length>0;
     $('#add-cart').textContent=`加入購物車・${money(unit*quantity)}`;
     $('#validation').textContent=missing.length?`尚須選擇：${missing.map(group=>group.title).join('、')}`:'已完成選擇';
@@ -47,7 +48,19 @@
     values[button.dataset.option]=Math.max(1,Math.min(99,values[button.dataset.option]+Number(button.dataset.delta)));renderOptions();
   });
   $('#minus').onclick=()=>{quantity=Math.max(1,quantity-1);updateTotal();};
-  $('#plus').onclick=()=>{quantity=Math.min(item.maxQty,quantity+1);updateTotal();};
+  $('#plus').onclick=()=>{
+    if(quantity>=item.maxQty){notifyLimit();return;}
+    quantity+=1;updateTotal();
+    if(quantity===item.maxQty) notifyLimit('已達本次點餐份數上限');
+  };
+  function notifyLimit(message='已達本次點餐份數上限'){
+    const toast=document.querySelector('#menu-toast');
+    dialog.append(toast);
+    toast.textContent=message;
+    toast.classList.add('show');
+    clearTimeout(notifyLimit.timer);
+    notifyLimit.timer=setTimeout(()=>toast.classList.remove('show'),2600);
+  }
   $('#close-detail').onclick=()=>dialog.close();
   dialog.querySelectorAll('[data-flavor]').forEach(button=>button.onclick=()=>button.setAttribute('aria-pressed',String(button.getAttribute('aria-pressed')!=='true')));
   $('#custom-flavor').onclick=()=>{
