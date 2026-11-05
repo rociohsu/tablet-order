@@ -1,5 +1,7 @@
 const view = document.querySelector("#view");
 const toast = document.querySelector("#toast");
+const logoutButton = document.querySelector("#header-logout");
+const orderReminder = document.querySelector("#order-reminder");
 
 const banners = [
   { image: "assets/banner1.jpg" },
@@ -16,6 +18,7 @@ const zones = {
 
 let carouselTimer;
 let currentSlide = 0;
+let loginCode = "";
 
 function setServiceBell(visible) {
   document.querySelector("#service-bell").classList.toggle("visible", visible);
@@ -29,9 +32,9 @@ function carouselMarkup() {
   return `
     <section class="carousel" id="carousel" aria-label="待機輪播圖">
       ${banners.map((banner, index) => `
-        <article class="slide ${index === 0 ? "active" : ""}" style="background-image:url('${banner.image}')"></article>`).join("")}
+        <article class="slide ${index === currentSlide ? "active" : ""}" style="background-image:url('${banner.image}')"></article>`).join("")}
       <div class="dots" aria-label="輪播頁數">
-        ${banners.map((_, index) => `<button class="dot ${index === 0 ? "active" : ""}" data-slide="${index}" aria-label="第 ${index + 1} 張"></button>`).join("")}
+        ${banners.map((_, index) => `<button class="dot ${index === currentSlide ? "active" : ""}" data-slide="${index}" aria-label="第 ${index + 1} 張"></button>`).join("")}
       </div>
     </section>`;
 }
@@ -78,6 +81,10 @@ function codeField(label = "請輸入通行碼") {
 }
 
 function renderLogin() {
+  loginCode = "";
+  logoutButton.hidden = true;
+  window.clearInterval(carouselTimer);
+  currentSlide = 0;
   setHeaderMode(false);
   setServiceBell(false);
   view.className = "view login-view";
@@ -87,18 +94,21 @@ function renderLogin() {
       <p>請輸入通行碼，開始今日服務</p>
       ${codeField()}
       <p class="hint" id="login-hint">6 碼半形數字通行碼</p>
+      <p class="login-error">驗證錯誤或門市尚未啟用服務</p>
       <button class="primary-button" type="submit">確定登入</button>
     </form>`;
 
   const input = document.querySelector("#code");
+  input.setAttribute("aria-describedby", "login-hint");
   input.focus();
   document.querySelector("#login-form").addEventListener("submit", (event) => {
     event.preventDefault();
     if (!/^\d{6}$/.test(input.value)) {
-      document.querySelector("#login-hint").textContent = "請輸入 6 碼半形數字通行碼";
       input.focus();
       return;
     }
+    loginCode = input.value;
+    logoutButton.hidden = false;
     renderStandby();
   });
 }
@@ -110,13 +120,12 @@ function renderStandby() {
   view.innerHTML = `
     ${carouselMarkup()}
     <footer class="standby-footer">
-      <div class="table-status"><strong>尚未配桌</strong>請先完成配桌，開始使用點餐服務</div>
+      <div class="table-status"><strong>尚未配桌</strong>請先完成配桌，才能使用點餐。</div>
       <button class="service-button" id="assign-table">配桌 <img class="button-icon" src="assets/icons/arrow-right.svg" alt="" aria-hidden="true" /></button>
     </footer>`;
 
-  document.querySelectorAll(".dot").forEach((dot) => dot.addEventListener("click", () => goToSlide(Number(dot.dataset.slide))));
   document.querySelector("#assign-table").addEventListener("click", () => renderVerification());
-  setupSwipe();
+  setupCarouselControls();
   startCarousel();
 }
 
@@ -131,17 +140,35 @@ function startCarousel() {
   carouselTimer = window.setInterval(() => goToSlide(currentSlide + 1), 5000);
 }
 
-function setupSwipe() {
+function setupCarouselControls() {
   const carousel = document.querySelector("#carousel");
+  const selectSlide = (index) => {
+    goToSlide(index);
+    startCarousel();
+  };
+  carousel.querySelectorAll(".dot").forEach((dot) => {
+    dot.addEventListener("click", () => selectSlide(Number(dot.dataset.slide)));
+  });
+
   let startX = 0;
-  carousel.addEventListener("pointerdown", (event) => { startX = event.clientX; carousel.setPointerCapture(event.pointerId); });
+  carousel.addEventListener("pointerdown", (event) => {
+    if (!event.isPrimary || event.button !== 0 || event.target.closest(".dots")) return;
+    startX = event.clientX;
+    carousel.setPointerCapture(event.pointerId);
+  });
   carousel.addEventListener("pointerup", (event) => {
+    if (!carousel.hasPointerCapture(event.pointerId)) return;
     const distance = event.clientX - startX;
-    if (Math.abs(distance) > 45) goToSlide(currentSlide + (distance < 0 ? 1 : -1));
+    if (Math.abs(distance) > 45) selectSlide(currentSlide + (distance < 0 ? 1 : -1));
   });
 }
 
 function renderVerification(onVerified = renderZones, purpose = "配桌") {
+  const verificationHints = {
+    配桌: "驗證通過後即可選擇用餐區域與桌位",
+    開桌: "驗證通過後即可進行開桌",
+    登出: "驗證通過後即可登出",
+  };
   window.clearInterval(carouselTimer);
   const overlay = document.createElement("div");
   overlay.className = "overlay";
@@ -150,17 +177,26 @@ function renderVerification(onVerified = renderZones, purpose = "配桌") {
       <h2>通行碼驗證</h2>
       <p>請輸入通行碼</p>
       ${codeField(`${purpose}通行碼`)}
-      <p class="hint" id="verify-hint">${purpose === "開桌" ? "驗證通過後即可進行開桌" : "驗證通過後即可選擇用餐區域與桌位"}</p>
+      <p class="hint" id="verify-hint" aria-live="polite">${verificationHints[purpose]}</p>
       <div class="verify-actions"><button class="secondary-button" type="button" id="cancel-verify">取消</button><button class="primary-button" type="submit">驗證</button></div>
     </form>`;
   document.querySelector("#app").appendChild(overlay);
   const input = overlay.querySelector("#code");
   input.focus();
-  overlay.querySelector("#cancel-verify").addEventListener("click", () => { overlay.remove(); startCarousel(); });
+  overlay.querySelector("#cancel-verify").addEventListener("click", () => {
+    overlay.remove();
+    if (view.querySelector("#carousel")) startCarousel();
+    if (purpose === "登出") logoutButton.focus();
+  });
   overlay.querySelector("#verify-form").addEventListener("submit", (event) => {
     event.preventDefault();
     if (!/^\d{6}$/.test(input.value)) {
       overlay.querySelector("#verify-hint").textContent = "通行碼格式錯誤，請輸入 6 碼半形數字";
+      input.focus();
+      return;
+    }
+    if (purpose === "登出" && input.value !== loginCode) {
+      overlay.querySelector("#verify-hint").textContent = "通行碼錯誤，請重新輸入";
       input.focus();
       return;
     }
@@ -215,37 +251,41 @@ function renderAssigned(table, opened = false) {
   view.innerHTML = `
     ${carouselMarkup()}
     <footer class="assigned-footer">
-      <button class="table-action" id="reassign-table" type="button"><strong>${table.replace("桌", "")}</strong><span>|</span>重新配桌</button>
-      <button class="start-order" id="start-order" type="button">${opened ? "開始點餐" : "開桌"} <img class="button-icon" src="assets/icons/arrow-right.svg" alt="" aria-hidden="true" /></button>
+      <button class="table-action" id="table-actions" type="button" aria-haspopup="dialog"><strong>${table.replace("桌", "")}</strong></button>
+      <button class="start-order" id="start-order" type="button" ${opened ? "" : "disabled"}>${opened ? '開始點餐 <img class="button-icon" src="assets/icons/arrow-right.svg" alt="" aria-hidden="true" />' : "尚未開桌"}</button>
     </footer>`;
-  document.querySelectorAll(".dot").forEach((dot) => dot.addEventListener("click", () => goToSlide(Number(dot.dataset.slide))));
-  document.querySelector("#reassign-table").addEventListener("click", () => renderVerification(() => renderManagement(table)));
+  document.querySelector("#table-actions").addEventListener("click", () => renderManagement(table, opened));
   document.querySelector("#start-order").addEventListener("click", () => {
-    if (opened) window.location.href = "menu.html";
-    else renderVerification(() => renderOpenTableStep(table, 1), "開桌");
+    window.location.href = "menu.html";
   });
   document.querySelector("#service-bell").onclick = renderServiceMenu;
-  setupSwipe();
+  setupCarouselControls();
   startCarousel();
 }
 
-function renderManagement(table) {
-  setHeaderMode(true);
-  setServiceBell(false);
-  view.className = "view management-view";
-  view.innerHTML = `
-    <section class="table-context" aria-label="目前桌位資訊">
-      <div><span>品牌</span><strong>石二鍋</strong></div>
-      <div><span>門市</span><strong>復興門市</strong></div>
-      <div><span>區域</span><strong>A區</strong></div>
-      <div><span>桌位</span><strong>${table}</strong></div>
-    </section>
-    <section class="management-actions">
-      <button class="management-action" id="management-reassign" type="button"><img src="assets/icons/reassign-table.svg" alt="" aria-hidden="true" /><span>重新配桌</span></button>
-      <button class="management-action" id="management-open" type="button"><img src="assets/icons/open-table.svg" alt="" aria-hidden="true" /><span>開桌</span></button>
-    </section>`;
-  document.querySelector("#management-reassign").addEventListener("click", renderZones);
-  document.querySelector("#management-open").addEventListener("click", () => renderVerification(() => renderOpenTableStep(table, 1), "開桌"));
+function renderManagement(table, opened) {
+  window.clearInterval(carouselTimer);
+  const dialog = document.createElement("dialog");
+  dialog.className = "verify-card table-actions-dialog";
+  dialog.setAttribute("aria-labelledby", "table-actions-title");
+  dialog.innerHTML = `
+    <form method="dialog">
+      <button class="service-menu-close" type="submit" aria-label="關閉桌位選單">×</button>
+      <h2 id="table-actions-title">${table}</h2>
+      <div class="verify-actions">
+        <button class="primary-button" type="submit" value="reassign">重新配桌</button>
+        <button class="primary-button" type="submit" value="open" ${opened ? "disabled" : ""}>開桌</button>
+      </div>
+    </form>`;
+  dialog.addEventListener("close", () => {
+    const action = dialog.returnValue;
+    dialog.remove();
+    if (action === "reassign") renderVerification();
+    else if (action === "open") renderVerification(() => renderOpenTableStep(table, 1), "開桌");
+    else startCarousel();
+  });
+  view.appendChild(dialog);
+  dialog.showModal();
 }
 
 function renderOpenTableStep(table, step, data = {}) {
@@ -292,7 +332,18 @@ function renderOpenTableStep(table, step, data = {}) {
       sessionStorage.removeItem("tablet-order-cart-v1");
     } catch { showToast("瀏覽器無法儲存開桌資訊"); }
     renderAssigned(table, true);
+    window.clearInterval(carouselTimer);
+    orderReminder.showModal();
   });
 }
 
+logoutButton.addEventListener("click", () => {
+  if (document.querySelector("#app > .overlay, #app > .service-menu-overlay")) return;
+  renderVerification(() => {
+    toast.classList.remove("show");
+    renderLogin();
+  }, "登出");
+});
+orderReminder.addEventListener("cancel", (event) => event.preventDefault());
+orderReminder.addEventListener("close", startCarousel);
 renderLogin();
