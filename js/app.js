@@ -1,7 +1,6 @@
 const view = document.querySelector("#view");
 const toast = document.querySelector("#toast");
 const logoutButton = document.querySelector("#header-logout");
-const orderReminder = document.querySelector("#order-reminder");
 
 const banners = [
   { image: "assets/banner1.jpg" },
@@ -18,6 +17,8 @@ const zones = {
 
 let carouselTimer;
 let currentSlide = 0;
+let countdownEndsAt = 0;
+let countdownTimer;
 let loginCode = "";
 
 function setServiceBell(visible) {
@@ -28,7 +29,7 @@ function setHeaderMode(management = false) {
   document.querySelector(".brand-bar").classList.toggle("management-mode", management);
 }
 
-function carouselMarkup() {
+function carouselMarkup(opened = false) {
   return `
     <section class="carousel" id="carousel" aria-label="待機輪播圖">
       ${banners.map((banner, index) => `
@@ -36,7 +37,31 @@ function carouselMarkup() {
       <div class="dots" aria-label="輪播頁數">
         ${banners.map((_, index) => `<button class="dot ${index === currentSlide ? "active" : ""}" data-slide="${index}" aria-label="第 ${index + 1} 張"></button>`).join("")}
       </div>
+      ${opened ? `
+        <aside class="order-countdown" aria-label="加點時間提醒">
+          <p class="order-countdown-title"><img class="order-countdown-icon" src="assets/icons/Icon_clock_red.svg" alt="" aria-hidden="true" />平板點餐時間倒數</p>
+          <strong id="order-countdown-time" role="timer">10:00</strong>
+          <progress id="order-countdown-progress" max="600" value="600" aria-label="平板點餐剩餘時間"></progress>
+          <p class="order-countdown-note">接下來提供人工加點服務</p>
+        </aside>` : ""}
     </section>`;
+}
+
+function startOrderCountdown() {
+  window.clearInterval(countdownTimer);
+  const update = () => {
+    const time = document.querySelector("#order-countdown-time");
+    if (!time) {
+      window.clearInterval(countdownTimer);
+      return;
+    }
+    const remaining = Math.max(0, Math.ceil((countdownEndsAt - Date.now()) / 1000));
+    time.textContent = `${String(Math.floor(remaining / 60)).padStart(2, "0")}:${String(remaining % 60).padStart(2, "0")}`;
+    document.querySelector("#order-countdown-progress").value = remaining;
+    if (remaining === 0) window.clearInterval(countdownTimer);
+  };
+  countdownTimer = window.setInterval(update, 1000);
+  update();
 }
 
 function showToast(message) {
@@ -81,6 +106,8 @@ function codeField(label = "請輸入通行碼") {
 }
 
 function renderLogin() {
+  window.clearInterval(countdownTimer);
+  countdownEndsAt = 0;
   loginCode = "";
   logoutButton.hidden = true;
   window.clearInterval(carouselTimer);
@@ -249,7 +276,7 @@ function renderAssigned(table, opened = false) {
   setServiceBell(true);
   view.className = "view standby-view";
   view.innerHTML = `
-    ${carouselMarkup()}
+    ${carouselMarkup(opened)}
     <footer class="assigned-footer">
       <button class="table-action" id="table-actions" type="button" aria-haspopup="dialog"><strong>${table.replace("桌", "")}</strong></button>
       <button class="start-order" id="start-order" type="button" ${opened ? "" : "disabled"}>${opened ? '開始點餐 <img class="button-icon" src="assets/icons/arrow-right.svg" alt="" aria-hidden="true" />' : "尚未開桌"}</button>
@@ -261,6 +288,7 @@ function renderAssigned(table, opened = false) {
   document.querySelector("#service-bell").onclick = renderServiceMenu;
   setupCarouselControls();
   startCarousel();
+  if (opened) startOrderCountdown();
 }
 
 function renderManagement(table, opened) {
@@ -331,9 +359,8 @@ function renderOpenTableStep(table, step, data = {}) {
       sessionStorage.setItem("tablet-order-session", JSON.stringify(context));
       sessionStorage.removeItem("tablet-order-cart-v1");
     } catch { showToast("瀏覽器無法儲存開桌資訊"); }
+    countdownEndsAt = Date.now() + 10 * 60 * 1000;
     renderAssigned(table, true);
-    window.clearInterval(carouselTimer);
-    orderReminder.showModal();
   });
 }
 
@@ -344,6 +371,4 @@ logoutButton.addEventListener("click", () => {
     renderLogin();
   }, "登出");
 });
-orderReminder.addEventListener("cancel", (event) => event.preventDefault());
-orderReminder.addEventListener("close", startCarousel);
 renderLogin();

@@ -223,12 +223,15 @@ button:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 28%, t
 .table-actions-dialog { position: fixed; inset: 0; margin: auto; }
 .table-actions-dialog::backdrop { background: color-mix(in srgb, var(--ink) 28%, transparent); backdrop-filter: blur(3px); }
 .table-actions-dialog .primary-button:disabled { cursor: default; background: var(--line); box-shadow: none; }
-#order-reminder { width: min(560px, calc(100% - 40px)); padding: 32px; border: 0; border-radius: 20px; background: var(--surface); color: var(--ink); font: inherit; box-shadow: var(--shadow); }
-#order-reminder::backdrop { background: color-mix(in srgb, var(--black) 42%, transparent); }
-#order-reminder-title { padding-right: 40px; margin-bottom: 24px; font-size: 30px; }
-#order-reminder-message { margin: 0 0 24px; font-size: 20px; line-height: 1.7; }
-.order-reminder-close { position: absolute; top: 14px; right: 16px; display: grid; place-items: center; width: 44px; height: 44px; padding: 10px; border-radius: 50%; background: color-mix(in srgb, var(--ink) 8.81%, var(--surface)); }
-.order-reminder-close img { display: block; width: 100%; height: 100%; }
+.order-countdown { position: absolute; right: 20px; bottom: 28px; z-index: 2; width: min(312px, calc(80% - 32px)); padding: 18px 24px; border-radius: 22px; background: color-mix(in srgb, var(--surface-warm) 96%, transparent); color: var(--brand); text-align: center; box-shadow: var(--shadow); pointer-events: none; }
+.order-countdown-title { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; font-size: clamp(16px, 1.6vw, 22px); font-weight: 700; }
+.order-countdown-icon { display: block; width: 26px; height: 26px; flex-shrink: 0; object-fit: contain; }
+#order-countdown-time { display: block; font-size: clamp(48px, 6vw, 76px); font-variant-numeric: tabular-nums; line-height: 1.15; }
+#order-countdown-progress { display: block; width: 100%; height: 7px; margin: 8px 0; border: 0; border-radius: 99px; overflow: hidden; appearance: none; background: color-mix(in srgb, var(--brand-II) 35%, var(--surface)); color: var(--brand-II); }
+#order-countdown-progress::-webkit-progress-bar { background: color-mix(in srgb, var(--brand-II) 35%, var(--surface)); }
+#order-countdown-progress::-webkit-progress-value { background: var(--brand-II); border-radius: 99px; }
+#order-countdown-progress::-moz-progress-bar { background: var(--brand-II); border-radius: 99px; }
+.order-countdown-note { margin: 0; font-size: clamp(16px, 1.6vw, 22px); }
 .verify-card .code-input { margin: 12px 0 0; }
 .verify-actions { display: flex; gap: 12px; margin-top: 16px; }
 .verify-actions .primary-button { flex: 1; }
