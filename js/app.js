@@ -1,6 +1,7 @@
 const view = document.querySelector("#view");
 const toast = document.querySelector("#toast");
 const logoutButton = document.querySelector("#header-logout");
+const headerCountdown = document.querySelector("#header-countdown");
 
 const banners = [
   { image: "assets/banner1.jpg" },
@@ -19,6 +20,7 @@ let carouselTimer;
 let currentSlide = 0;
 let countdownEndsAt = 0;
 let countdownTimer;
+let countdownMinimized = false;
 let loginCode = "";
 
 function setServiceBell(visible) {
@@ -37,8 +39,9 @@ function carouselMarkup(opened = false) {
       <div class="dots" aria-label="輪播頁數">
         ${banners.map((_, index) => `<button class="dot ${index === currentSlide ? "active" : ""}" data-slide="${index}" aria-label="第 ${index + 1} 張"></button>`).join("")}
       </div>
-      ${opened ? `
+      ${opened && !countdownMinimized ? `
         <aside class="order-countdown" aria-label="加點時間提醒">
+          <button class="order-countdown-close" type="button" aria-label="將倒數計時移至頁首"><img src="assets/icons/Icon_close.svg" alt="" /></button>
           <p class="order-countdown-title"><img class="order-countdown-icon" src="assets/icons/Icon_clock_red.svg" alt="" aria-hidden="true" />平板點餐時間倒數</p>
           <strong id="order-countdown-time" role="timer">10:00</strong>
           <progress id="order-countdown-progress" max="600" value="600" aria-label="平板點餐剩餘時間"></progress>
@@ -51,13 +54,17 @@ function startOrderCountdown() {
   window.clearInterval(countdownTimer);
   const update = () => {
     const time = document.querySelector("#order-countdown-time");
-    if (!time) {
+    if (!countdownEndsAt) {
       window.clearInterval(countdownTimer);
       return;
     }
     const remaining = Math.max(0, Math.ceil((countdownEndsAt - Date.now()) / 1000));
-    time.textContent = `${String(Math.floor(remaining / 60)).padStart(2, "0")}:${String(remaining % 60).padStart(2, "0")}`;
-    document.querySelector("#order-countdown-progress").value = remaining;
+    const formatted = `${String(Math.floor(remaining / 60)).padStart(2, "0")}:${String(remaining % 60).padStart(2, "0")}`;
+    if (time) {
+      time.textContent = formatted;
+      document.querySelector("#order-countdown-progress").value = remaining;
+    }
+    document.querySelector("#header-countdown-time").textContent = formatted;
     if (remaining === 0) window.clearInterval(countdownTimer);
   };
   countdownTimer = window.setInterval(update, 1000);
@@ -108,6 +115,8 @@ function codeField(label = "請輸入通行碼") {
 function renderLogin() {
   window.clearInterval(countdownTimer);
   countdownEndsAt = 0;
+  countdownMinimized = false;
+  headerCountdown.hidden = true;
   loginCode = "";
   logoutButton.hidden = true;
   window.clearInterval(carouselTimer);
@@ -179,7 +188,7 @@ function setupCarouselControls() {
 
   let startX = 0;
   carousel.addEventListener("pointerdown", (event) => {
-    if (!event.isPrimary || event.button !== 0 || event.target.closest(".dots")) return;
+    if (!event.isPrimary || event.button !== 0 || event.target.closest(".dots, .order-countdown-close")) return;
     startX = event.clientX;
     carousel.setPointerCapture(event.pointerId);
   });
@@ -360,9 +369,20 @@ function renderOpenTableStep(table, step, data = {}) {
       sessionStorage.removeItem("tablet-order-cart-v1");
     } catch { showToast("瀏覽器無法儲存開桌資訊"); }
     countdownEndsAt = Date.now() + 10 * 60 * 1000;
+    countdownMinimized = false;
+    headerCountdown.hidden = true;
     renderAssigned(table, true);
   });
 }
+
+view.addEventListener("click", (event) => {
+  const close = event.target.closest(".order-countdown-close");
+  if (!close) return;
+  countdownMinimized = true;
+  close.closest(".order-countdown").remove();
+  headerCountdown.hidden = false;
+  document.querySelector("#service-bell").focus();
+});
 
 logoutButton.addEventListener("click", () => {
   if (document.querySelector("#app > .overlay, #app > .service-menu-overlay")) return;
