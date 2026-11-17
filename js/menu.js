@@ -282,7 +282,7 @@ function renderOrderStatus() {
   $('#status-opened').textContent = TabletOrderView.dining[3][1];
   $('#status-last').textContent = '10:30';
   $('#status-end').textContent = '11:00';
-  $('#status-next').textContent = '05:00';
+  $('#status-next').textContent = '10:10';
   const count = cart.reduce((sum,line)=>sum+line.qty,0);
   $('#cart-count').textContent = count;
   $('#view-cart').disabled = count === 0;

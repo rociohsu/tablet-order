@@ -71,3 +71,10 @@ body.tablet-only > dialog.onsite-payment-lock::backdrop{
   display:block;
   background:var(--brand-dark);
 }
+/* Keep the existing dining grid and typography with evenly spaced dividers. */
+.dining-info{gap:20px}
+.dining-info>div{position:relative;padding:8px 10px;border-radius:8px}
+.dining-info>div:nth-child(even)::before{content:"";position:absolute;left:-10px;top:10px;bottom:10px;width:1px;min-width:1px;max-width:1px;background:var(--line);clip-path:inset(10% 0)}
+.dining-info>.dining-highlight{background:var(--runtime-canvas-light)}
+.dining-info>.dining-highlight dd{color:var(--notice)}
+.dining-info>.dining-highlight:nth-child(2) dd{color:var(--ink)}

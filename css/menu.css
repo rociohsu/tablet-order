@@ -319,6 +319,22 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
 /* Consistent horizontal spacing in the dining status bar at every width. */
 .order-status-bar .table-summary>div{padding-left:10px;padding-right:10px}
 .order-status-bar .time-summary{padding-left:10px;padding-right:10px;justify-content:start;column-gap:10px}
+/* Equal spacing between dining fields, including the two summary groups. */
+.order-status-bar{display:flex;flex-wrap:nowrap;gap:12px;align-items:stretch}
+.order-status-bar .table-summary,
+.order-status-bar .time-summary{display:contents}
+.order-status-bar dt,
+.order-status-bar dd{white-space:normal;overflow-wrap:anywhere}
+.order-status-bar .table-summary>div,
+.order-status-bar .time-summary>div{position:relative;flex:0 1 auto;min-width:0;padding:8px;background:transparent;border-radius:8px}
+.order-status-bar .table-summary>div+div::before,
+.order-status-bar .time-summary>div+div::before,
+.order-status-bar .time-summary>div:first-child::before{content:"";position:absolute;left:-6px;top:10px;bottom:10px;width:1px;min-width:1px;max-width:1px;background:var(--line);clip-path:inset(10% 0)}
+.order-status-bar .table-summary>div:nth-child(2),
+.order-status-bar .time-summary>div:nth-child(2){background:var(--runtime-canvas-light)}
+.order-status-bar .table-summary>div:nth-child(2){max-width:185px}
+.order-status-bar .time-summary>div:nth-child(2) dd{color:var(--notice)}
+.order-status-bar .view-cart{flex:0 0 auto;min-width:240px;margin-left:auto}
 /* Combo products share the dialog shell and its fixed action footer. */
 #meal-flavor-heading{font-size:18px;margin:18px 0 12px}
 #quantity-label{font-size:16px;white-space:nowrap}

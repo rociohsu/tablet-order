@@ -20,7 +20,7 @@
   }
   const lines = [...grouped.values()].filter(line => line.qty > 0);
   const subtotal = lines.reduce((sum, line) => sum + line.unit * line.qty, 0);
-  $('#dining-info').innerHTML = TabletOrderView.dining.map(([label,value]) => `<div><dt>${label}</dt><dd>${escape(value)}</dd></div>`).join('');
+  $('#dining-info').innerHTML = TabletOrderView.dining.map(([label,value]) => `<div${['方案', '最後加點'].includes(label) ? ' class="dining-highlight"' : ''}><dt>${label}</dt><dd>${escape(value)}</dd></div>`).join('');
   $('#item-count').textContent = `共 ${lines.reduce((sum,line) => sum + line.qty, 0)} 份`;
   $('#payment-items').innerHTML = lines.map(line => {
     const description = preferences(line);
