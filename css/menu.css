@@ -333,6 +333,7 @@ button:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
 .order-status-bar .table-summary>div:nth-child(2),
 .order-status-bar .time-summary>div:nth-child(2){background:var(--runtime-canvas-light)}
 .order-status-bar .table-summary>div:nth-child(2){max-width:185px}
+.order-status-bar #status-plan,
 .order-status-bar .time-summary>div:nth-child(2) dd{color:var(--notice)}
 .order-status-bar .view-cart{flex:0 0 auto;min-width:240px;margin-left:auto}
 /* Combo products share the dialog shell and its fixed action footer. */
